@@ -5,6 +5,7 @@
 **Status**: ✅ Production Ready | Military-Grade Security | Deploy anytime
 
 **Live**: https://markzap.online
+**Live**: https://make-zap-nuz2.vercel.app/
 
 ---
 
