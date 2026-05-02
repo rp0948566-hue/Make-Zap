@@ -1,0 +1,239 @@
+# ============================================
+# MARKZAP PROJECT - SECURITY & ORGANIZATION
+# Comprehensive .gitignore for production
+# ============================================
+
+# 🔴 RED ZONE - NEVER commit these (secrets, credentials)
+
+# Jetro credentials and daemon files
+.jetro/
+.jetro/daemon/
+.jetro/daemon/credentials.json
+*.credentials.json
+*credentials*.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# API keys and secrets
+*.key
+*.pem
+*.crt
+*.p12
+*.pfx
+*.cer
+secrets.json
+secrets.yaml
+secrets.yml
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+.metadata/
+
+# Node.js and npm
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.log
+target/
+build/
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Ruby
+.bundle/
+log/
+tmp/
+.byebug_history
+
+# Go
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.work
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Backup files
+backup/
+backup/**/*
+*.backup
+*.bak
+*.old
+*.orig
+autobak/
+old/
+archive/
+archived/
+
+# Temporary and cache files
+temp/
+tmp/
+.tmp/
+.cache/
+*.tmp
+*.temp
+*.cache
+*.pid
+*.seed
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Playwright and testing
+.playwright-mcp/
+.playwright/
+test-results/
+ playwright-report/
+.blob-report/
+.coverage/
+.nyc_output/
+coverage/
+.nyc_output/
+
+# Kilo CLI (safe to ignore)
+.kilocode/
+.kilo/
+
+# System files
+Desktop.ini
+$RECYCLE.BIN/
+
+# Compiled static files (if any build step is added)
+dist/
+build/
+out/
+site/
+public/build/
+*.codekit
+
+# Session and cookie files
+*.sess
+*.sessions
+.cookies/
+
+# Database files (if any local DB)
+*.sqlite
+*.db
+*.sqlite3
+
+# Upload directories (safe to ignore, but content is untrusted)
+uploads/
+ user_uploads/
+ temp_uploads/
+
+# ============================================
+# PROJECT-SPECIFIC EXCEPTIONS
+# ============================================
+
+# Keep these files even though they match patterns above:
+
+# Assets are IMPORTANT - keep them tracked
+!assets/
+!assets/**/*
+
+# Main index.html - CRITICAL production file
+!index.html
+
+# Configuration files (non-sensitive)
+!.gitignore
+!README.md (if added)
+!PROJECT_STRUCTURE.md (if added)
+!SECURITY.md (if added)
+!DEPLOYMENT.md (if added)
+!BACKUP.md (if added)
+
+# Scripts folder (non-sensitive deploy scripts)
+!scripts/
+!scripts/**/*.sh
+!scripts/**/*.bat
+
+# Public deploy package
+!public/
+!public/**/*.html
+!public/assets/
+!public/assets/**/*
+
+# Development folder structure (archived old versions)
+!development/
+!development/**/*.html
+
+# ============================================
+# END OF GITIGNORE
+# ============================================
+
+# Notes:
+# 1. Always review before committing - use `git status` and `git diff`
+# 2. The .jetro/ directory contains credentials - NEVER commit
+# 3. Backup files are automatically excluded
+# 4. Logs and cache always excluded

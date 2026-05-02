@@ -1,0 +1,196 @@
+{
+  "project": {
+    "name": "MarkZap Digital Agency",
+    "version": "1.0.0",
+    "domain": "https://markzap.online",
+    "production_url": "https://markzap.online",
+    "staging_url": "https://staging.markzap.online"
+  },
+  "security": {
+    "enforce_https": true,
+    "hsts_max_age": 31536000,
+    "hsts_include_subdomains": true,
+    "hsts_preload": true,
+    "csp_nonce": false,
+    "csp_report_uri": "/csp-violation-report",
+    "csp_report_only": false,
+    "secure_cookies": true,
+    "cookie_samesite": "Strict",
+    "x_frame_options": "DENY",
+    "x_content_type_options": "nosniff",
+    "referrer_policy": "strict-origin-when-cross-origin",
+    "permissions_policy": "geolocation=(), microphone=(), camera=()"
+  },
+  "build": {
+    "source_dir": ".",
+    "output_dir": "public",
+    "assets_dir": "assets",
+    "html_minify": true,
+    "css_minify": true,
+    "js_minify": true,
+    "image_optimization": true,
+    "generate_sitemap": true,
+    "generate_robots": true,
+    "webmanifest": true
+  },
+  "deployment": {
+    "platform": "netlify",
+    "build_command": "cp index.html public/ && cp -r assets public/",
+    "publish_directory": "public",
+    "environment_variables": {
+      "NODE_ENV": "production",
+      "NPM_VERSION": "latest"
+    },
+    "headers": [
+      {
+        "for": "/*",
+        "values": {
+          "X-Frame-Options": "DENY",
+          "X-Content-Type-Options": "nosniff",
+          "X-XSS-Protection": "1; mode=block",
+          "Referrer-Policy": "strict-origin-when-cross-origin",
+          "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+          "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload"
+        }
+      },
+      {
+        "for": "/assets/*",
+        "values": {
+          "Cache-Control": "public, max-age=31536000, immutable"
+        }
+      },
+      {
+        "for": "/*.html",
+        "values": {
+          "Cache-Control": "public, max-age=3600, must-revalidate"
+        }
+      }
+    ],
+    "redirects": [
+      {
+        "from": "http://markzap.online/*",
+        "to": "https://markzap.online/:splat",
+        "status": 301,
+        "force": true
+      },
+      {
+        "from": "https://markzap.online/*",
+        "to": "https://www.markzap.online/:splat",
+        "status": 301,
+        "force": true
+      }
+    ],
+    "clean_urls": true,
+    "trailing_slash": false
+  },
+  "cache": {
+    "enabled": true,
+    "html_ttl": 3600,
+    "assets_ttl": 31536000,
+    "api_ttl": 300,
+    "cdn_enabled": false,
+    "cdn_provider": null
+  },
+  "monitoring": {
+    "health_check_url": "/health",
+    "uptime_monitoring": "https://uptimerobot.com",
+    "error_tracking": "sentry",
+    "analytics": "google-analytics",
+    "ga_tracking_id": "G-XXXXXXXXXX"
+  },
+  "backup": {
+    "enabled": true,
+    "frequency": "daily",
+    "retention_days": 7,
+    "cloud_sync": {
+      "enabled": false,
+      "provider": "google-drive",
+      "folder_id": null
+    }
+  },
+  "seo": {
+    "title": "MarkZap — Full-Stack Digital Agency, Indore",
+    "description": "MarkZap is a premier full-stack digital marketing agency in Indore. We specialize in website design, social media marketing, automation, and lead generation for Indian businesses.",
+    "keywords": "digital marketing agency indore, web design indore, social media marketing, lead generation, whatsapp automation, seo indore, markzap",
+    "author": "MarkZap Digital",
+    "language": "en",
+    "robots": "index, follow",
+    "canonical": "https://markzap.online/",
+    "open_graph": {
+      "type": "website",
+      "url": "https://markzap.online/",
+      "title": "MarkZap — Full-Stack Digital Agency, Indore",
+      "description": "MarkZap is a premier full-stack digital marketing agency in Indore. We specialize in website design, social media marketing, automation, and lead generation.",
+      "image": "https://markzap.online/Mark%20Zap.png"
+    },
+    "twitter": {
+      "card": "summary_large_image",
+      "url": "https://markzap.online/",
+      "title": "MarkZap — Full-Stack Digital Agency, Indore",
+      "description": "MarkZap is a premier full-stack digital marketing agency in Indore. We specialize in website design, social media marketing, automation, and lead generation.",
+      "image": "https://markzap.online/Mark%20Zap.png"
+    }
+  },
+  "performance": {
+    "critical_css_inline": true,
+    "lazy_load_images": true,
+    "preload_fonts": [
+      "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap"
+    ],
+    "preconnect": [
+      "https://fonts.googleapis.com",
+      "https://fonts.gstatic.com"
+    ],
+    "dns_prefetch": []
+  },
+  "contact": {
+    "company": "MarkZap Digital Agency",
+    "email": "markzap22@gmail.com",
+    "phone": "+919752948832",
+    "alternate_phone": "+917566097056",
+    "address": {
+      "street": "Scheme No 113, Vijay Nagar",
+      "city": "Indore",
+      "state": "MP",
+      "country": "IN",
+      "zip": "452001"
+    }
+  },
+  "social": {
+    "instagram": "https://instagram.com/markzap",
+    "facebook": "https://facebook.com/markzap",
+    "linkedin": "https://linkedin.com/company/markzap",
+    "youtube": null,
+    "twitter": null
+  },
+  "services": {
+    "website_design": {
+      "starting_price": 4999,
+      "delivery_days": "3-5"
+    },
+    "social_media": {
+      "starting_price": 4999,
+      "delivery_days": "Monthly"
+    },
+    "digital_marketing": {
+      "starting_price": 9999,
+      "delivery_days": "Monthly"
+    },
+    "automation_crm": {
+      "starting_price": 9999,
+      "delivery_days": "7-10"
+    },
+    "calling_agents": {
+      "starting_price": 4999,
+      "delivery_days": "Monthly"
+    },
+    "poster_graphics": {
+      "starting_price": 1999,
+      "delivery_days": "24-48 hours"
+    },
+    "lead_generation": {
+      "starting_price": 9999,
+      "delivery_days": "Monthly"
+    }
+  }
+}
