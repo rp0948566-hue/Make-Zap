@@ -74,13 +74,14 @@
   ],
   "redirects": [
     {
-      "source": "http://markzap.online/:path*",
-      "destination": "https://markzap.online/:path*",
-      "permanent": true
-    },
-    {
-      "source": "https://markzap.online/:path*",
-      "destination": "https://www.markzap.online/:path*",
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "markzap.online"
+        }
+      ],
+      "destination": "https://www.markzap.online/:1",
       "permanent": true
     }
   ]

@@ -174,8 +174,11 @@ dist/
 build/
 out/
 site/
-public/build/
+public/
+public/**/*
 *.codekit
+
+# Except: Keep vercel.json and netlify config at root (not in public/)
 
 # Session and cookie files
 *.sess

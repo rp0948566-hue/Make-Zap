@@ -7,7 +7,8 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const PROJECT_ROOT = __dirname;
+// Project root is parent of scripts/ directory
+const PROJECT_ROOT = path.resolve(__dirname, '..');
 const BUILD_DIR = path.join(PROJECT_ROOT, 'public');
 const SOURCE_HTML = path.join(PROJECT_ROOT, 'index.html');
 const ASSETS_DIR = path.join(PROJECT_ROOT, 'assets');

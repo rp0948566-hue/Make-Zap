@@ -1,0 +1,25 @@
+{
+  "name": "MarkZap Dev",
+  "script": "server.js",
+  "watch": [
+    "index.html",
+    "server.js",
+    "assets/",
+    "scripts/"
+  ],
+  "ext": "js,html,css,json",
+  "ignore": [
+    "public/",
+    "node_modules/",
+    ".git/",
+    "backup/",
+    "temp/",
+    "*.log"
+  ],
+  "delay": "1000",
+  "env": {
+    "NODE_ENV": "development",
+    "PORT": "3000"
+  },
+  "exec": "node server.js"
+}
