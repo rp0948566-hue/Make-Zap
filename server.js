@@ -77,8 +77,16 @@ if (NODE_ENV === 'development') {
 
 app.use(helmet(securityConfig));
 
+// Host redirect - redirect non-www to www
+app.use((req, res, next) => {
+  const host = req.headers.host;
+  if (host && host.startsWith('markzap.online') && !host.startsWith('www.')) {
+    return res.redirect(301, `https://www.markzap.online${req.url}`);
+  }
+  next();
+});
+
 // CORS configuration
-const cors = require('cors');
 const corsOptions = {
   origin: NODE_ENV === 'development' ? '*' : 'https://markzap.online',
   methods: ['GET', 'POST', 'OPTIONS'],

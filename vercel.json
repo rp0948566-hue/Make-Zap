@@ -81,7 +81,7 @@
           "value": "markzap.online"
         }
       ],
-      "destination": "https://www.markzap.online/:1",
+      "destination": "https://www.markzap.online/$1",
       "permanent": true
     }
   ]
