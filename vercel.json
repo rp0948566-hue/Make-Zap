@@ -71,18 +71,5 @@
         }
       ]
     }
-  ],
-  "redirects": [
-    {
-      "source": "/(.*)",
-      "has": [
-        {
-          "type": "host",
-          "value": "markzap.online"
-        }
-      ],
-      "destination": "https://www.markzap.online/$1",
-      "permanent": true
-    }
   ]
 }
