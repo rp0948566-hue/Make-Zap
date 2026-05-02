@@ -106,7 +106,7 @@ coverage/
 htmlcov/
 
 # Build artifacts (local)
-public/  # Vercel generates its own build
+# public/  # Removed from ignore - needed for runtime
 
 # Vercel itself
 .vercel/
