@@ -1,0 +1,102 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'markzap-production'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - 'alertmanager:9093'
+
+# Rule files
+rule_files:
+  - "/etc/prometheus/rules/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # Node Exporter (system metrics)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+        labels:
+          service: 'node-exporter'
+
+  # ECS/Container metrics
+  - job_name: 'ecs'
+    ecs_sd_configs:
+      - region: us-east-1
+        cluster: markzap-cluster-prod
+    relabel_configs:
+      - source_labels: [__meta_ecs_task_definition_family]
+        regex: 'markzap.*'
+        action: keep
+
+  # Application metrics
+  - job_name: 'markzap-app'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['markzap-app:3000']
+        labels:
+          service: 'markzap'
+          tier: 'application'
+
+  # PostgreSQL metrics
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres-exporter:9187']
+        labels:
+          service: 'postgres'
+          tier: 'database'
+
+  # Redis metrics
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis-exporter:9121']
+        labels:
+          service: 'redis'
+          tier: 'cache'
+
+  # AWS CloudWatch metrics
+  - job_name: 'cloudwatch'
+    cloudwatch_e2e_sd_configs:
+      - region: us-east-1
+        role_arn: arn:aws:iam::ACCOUNT:role/PrometheusCloudWatchRole
+    metric_relabel_configs:
+      - source_labels: [__name__]
+        regex: '(AWS|ECS|RDS|ElastiCache)_.*'
+        action: keep
+
+  # Blackbox exporter (HTTP probes)
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - https://markzap.online
+        - https://staging.markzap.online
+        - http://markzap-app:3000
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+
+  # cAdvisor (container metrics)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+        labels:
+          service: 'cadvisor'
+          tier: 'infrastructure'

@@ -1,0 +1,453 @@
+# Kubernetes Manifests for MarkZap Production
+# Military-grade deployment with high availability
+
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: markzap
+  labels:
+    name: markzap
+    environment: production
+
+---
+# ConfigMap for application configuration
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: markzap-config
+  namespace: markzap
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  DATABASE_HOST: "markzap-postgres"
+  REDIS_HOST: "markzap-redis"
+  REDIS_PORT: "6379"
+  LOG_LEVEL: "info"
+
+---
+# Secret for sensitive data (populated via external-secrets or terraform)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: markzap-secrets
+  namespace: markzap
+type: Opaque
+data:
+  # Base64 encoded values - replace with real secrets via K8s secrets or Vault
+  POSTGRES_PASSWORD: <base64-encoded>
+  REDIS_PASSWORD: <base64-encoded>
+  SESSION_SECRET: <base64-encoded>
+
+---
+# PersistentVolumeClaim for database (if using stateful sets locally)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: markzap
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: gp3
+
+---
+# PostgreSQL Deployment (for on-prem/K8s only - use RDS in AWS)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: markzap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "markzap"
+        - name: POSTGRES_USER
+          value: "markzap"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: markzap-secrets
+              key: POSTGRES_PASSWORD
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: postgres-storage
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: markzap
+spec:
+  selector:
+    app: postgres
+  ports:
+  - port: 5432
+    targetPort: 5432
+  type: ClusterIP
+
+---
+# Redis Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  namespace: markzap
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+        args: ["redis-server", "--requirepass", "$(REDIS_PASSWORD)"]
+        env:
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: markzap-secrets
+              key: REDIS_PASSWORD
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+
+---
+# Redis Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: markzap
+spec:
+  selector:
+    app: redis
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+
+---
+# Main Application Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: markzap-app
+  namespace: markzap
+  labels:
+    app: markzap
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: markzap
+  template:
+    metadata:
+      labels:
+        app: markzap
+        version: v1
+    spec:
+      containers:
+      - name: markzap
+        image: ${ECR_REPOSITORY}:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: markzap-config
+              key: NODE_ENV
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: markzap-config
+              key: PORT
+        - name: DATABASE_URL
+          value: "postgresql://markzap:$(POSTGRES_PASSWORD)@postgres:5432/markzap"
+        - name: REDIS_URL
+          value: "redis://:$(REDIS_PASSWORD)@redis:6379"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: markzap-secrets
+              key: POSTGRES_PASSWORD
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: markzap-secrets
+              key: REDIS_PASSWORD
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: markzap-secrets
+              key: SESSION_SECRET
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1001
+          capabilities:
+            drop:
+            - ALL
+
+---
+# Horizontal Pod Autoscaler
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: markzap-hpa
+  namespace: markzap
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: markzap-app
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+
+---
+# Vertical Pod Autoscaler (optional - for resource optimization)
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: markzap-vpa
+  namespace: markzap
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: Deployment
+    name: markzap-app
+  updatePolicy:
+    updateMode: "Auto"
+
+---
+# Service for application
+apiVersion: v1
+kind: Service
+metadata:
+  name: markzap-service
+  namespace: markzap
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  selector:
+    app: markzap
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+
+---
+# Ingress for HTTPS routing
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: markzap-ingress
+  namespace: markzap
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+spec:
+  tls:
+  - hosts:
+    - markzap.online
+    - www.markzap.online
+    secretName: markzap-tls
+  rules:
+  - host: markzap.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: markzap-service
+            port:
+              number: 80
+  - host: www.markzap.online
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: markzap-service
+            port:
+              number: 80
+
+---
+# Pod Disruption Budget (ensure high availability)
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: markzap-pdb
+  namespace: markzap
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: markzap
+
+---
+# Network Policy (zero-trust)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: markzap-netpol
+  namespace: markzap
+spec:
+  podSelector:
+    matchLabels:
+      app: markzap
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          app: nginx-ingress
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 53  # DNS
+    - protocol: UDP
+      port: 53
+
+---
+# Backup CronJob for database (if not using RDS)
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: postgres-backup
+  namespace: markzap
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup
+            image: postgres:16-alpine
+            command:
+            - /bin/sh
+            - -c
+            - |
+              pg_dump -h postgres -U markzap markzap > /backup/dump_$(date +%Y%m%d).sql
+            env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: markzap-secrets
+                  key: POSTGRES_PASSWORD
+            volumeMounts:
+            - name: backup-volume
+              mountPath: /backup
+          volumes:
+          - name: backup-volume
+            persistentVolumeClaim:
+              claimName: backup-pvc
+          restartPolicy: OnFailure

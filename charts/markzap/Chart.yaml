@@ -1,0 +1,340 @@
+# Helm Chart for MarkZap Application
+# Kubernetes deployment with enterprise features
+
+apiVersion: v2
+name: markzap
+description: MarkZap Digital Agency - Production Website
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - website
+  - marketing
+  - express
+  - nodejs
+home: https://markzap.online
+sources:
+  - https://github.com/your-org/markzap
+maintainers:
+  - name: MarkZap DevOps Team
+    email: devops@markzap.online
+
+# Dependencies
+dependencies: []
+
+# Values schema for validation
+# values.schema.json
+
+---
+# Templates
+
+# Templates directory structure:
+# templates/
+# ├── deployment.yaml
+# ├── service.yaml
+# ├── ingress.yaml
+# ├── configmap.yaml
+# ├── secret.yaml
+# ├── hpa.yaml
+# ├── pdb.yaml
+# ├── serviceaccount.yaml
+# ├── rbac.yaml
+# ├── poddisruptionbudget.yaml
+# ├── networkpolicy.yaml
+# ├── cronjob.yaml (backup)
+# └── _helpers.tpl
+
+# Values file: values.yaml
+replicaCount: 3
+
+image:
+  repository: ghcr.io/rp0948566-hue/markzap-agency
+  pullPolicy: IfNotPresent
+  tag: latest
+
+# Override for different environments
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Service Account
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+# Pod Security Context
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1001
+  runAsGroup: 1001
+  fsGroup: 1001
+  seccompProfile:
+    type: RuntimeDefault
+
+# Security Context (container-level)
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 1001
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE  # Only if binding to port < 1024
+
+# Service
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+  annotations: {}
+
+# Ingress
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+      more_set_headers "Permissions-Policy: geolocation=(), microphone=(), camera=()";
+      more_set_headers "Strict-Transport-Security: max-age=31536000; includeSubDomains; preload";
+  hosts:
+    - host: markzap.online
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: www.markzap.online
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: markzap-tls
+      hosts:
+        - markzap.online
+        - www.markzap.online
+
+# Resource limits
+resources:
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+  requests:
+    cpu: "500m"
+    memory: "512Mi"
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 3
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+# Node selector (if using dedicated nodes)
+nodeSelector: {}
+
+# Tolerations (for taints)
+tolerations: []
+
+# Affinity (spread across AZs)
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: markzap
+          topologyKey: kubernetes.io/hostname
+
+# ConfigMap
+config:
+  NODE_ENV: "production"
+  PORT: "3000"
+  LOG_LEVEL: "info"
+  # Database connection (via secret)
+  # DATABASE_URL: from secret
+  # REDIS_URL: from secret
+
+# Secrets (reference to AWS Secrets Manager or k8s secret)
+secret:
+  enabled: true
+  # Use external-secrets to sync from AWS Secrets Manager
+  externalSecrets:
+    createdBy: "external-secrets"
+
+# Pod Disruption Budget
+pdb:
+  enabled: true
+  minAvailable: 2
+
+# Network Policy (Zero Trust)
+networkPolicy:
+  enabled: true
+  # Only allow ingress from nginx-ingress controller
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: ingress-nginx
+      ports:
+        - protocol: TCP
+          port: 3000
+  # Egress only to postgres and redis
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: markzap
+          podSelector:
+            matchLabels:
+              app: postgres
+        ports:
+          - protocol: TCP
+            port: 5432
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: markzap
+          podSelector:
+            matchLabels:
+              app: redis
+        ports:
+          - protocol: TCP
+            port: 6379
+    - to: []  # Allow DNS
+        ports:
+          - protocol: UDP
+            port: 53
+
+# Pod Annotations (for monitoring)
+podAnnotations:
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "3000"
+  prometheus.io/path: "/metrics"
+  cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+
+# Liveness/Readiness Probes
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 5
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+# Startup Probe (for slow-starting containers)
+startupProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  failureThreshold: 30
+  periodSeconds: 10
+
+# Sidecar containers (optional)
+sidecars: []
+
+# Init containers (optional)
+initContainers: []
+
+---
+# HPA (Horizontal Pod Autoscaler)
+{{- if .Values.autoscaling.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "markzap.fullname" . }}
+  labels:
+    {{- include "markzap.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "markzap.fullname" . }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetMemoryUtilizationPercentage }}
+{{- end }}
+
+---
+# PDB (Pod Disruption Budget)
+{{- if .Values.pdb.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "markzap.fullname" . }}
+  labels:
+    {{- include "markzap.labels" . | nindent 4 }}
+spec:
+  minAvailable: {{ .Values.pdb.minAvailable }}
+  selector:
+    matchLabels:
+      {{- include "markzap.selectorLabels" . | nindent 6 }}
+{{- end }}
+
+---
+# ServiceAccount
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ include "markzap.serviceAccountName" . }}
+  labels:
+    {{- include "markzap.labels" . | nindent 4 }}
+  {{- with .Values.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+
+---
+# NetworkPolicy (Zero Trust)
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "markzap.fullname" . }}
+  labels:
+    {{- include "markzap.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "markzap.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    {{- toYaml .Values.networkPolicy.ingress | nindent 4 }}
+  egress:
+    {{- toYaml .Values.networkPolicy.egress | nindent 4 }}
+{{- end }}

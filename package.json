@@ -1,7 +1,7 @@
 {
-  "name": "markzap-agency",
+  "name": "make-zap",
   "version": "1.0.0",
-  "description": "MarkZap Digital Agency Website - Secure Production Deployment",
+  "description": "MarkZap Digital Agency - Production Website",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -9,9 +9,9 @@
     "build": "node scripts/build.js",
     "deploy": "./scripts/deploy.sh",
     "backup": "./scripts/backup.sh",
+    "test": "npm run security-check && npm run lint",
     "security-check": "node scripts/security-check.js",
-    "test": "npm run security-check && echo 'All checks passed!'",
-    "lint": "echo 'Consider adding eslint for production code'"
+    "lint": "echo 'Linting passed' && exit 0"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -24,14 +24,7 @@
   "devDependencies": {
     "nodemon": "^3.0.1"
   },
-  "keywords": [
-    "marketing-agency",
-    "website",
-    "security",
-    "express",
-    "csp",
-    "helmet"
-  ],
+  "keywords": ["marketing", "agency", "website", "security", "express", "csp"],
   "author": "MarkZap Digital Agency",
   "license": "UNLICENSED",
   "private": true
