@@ -1,12 +1,11 @@
 // ─── ChatDB: Unlimited Persistent Memory via IndexedDB ────────────────────
 // Stores every message, session, and model selection permanently.
-// No size limits (unlike localStorage's 5 MB). Survives page reloads.
-// All operations are async and non-blocking.
+// Supports multi-user isolation by tagging sessions with userId (e.g. Google UID or guest).
 
-const DB_NAME    = 'KimiChatDB';
-const DB_VERSION = 2;
+const DB_NAME    = 'MarkZapChatDB';
+const DB_VERSION = 3;
 const STORES = {
-    sessions : 'sessions',  // { id, title, createdAt, updatedAt, model }
+    sessions : 'sessions',  // { id, userId, title, createdAt, updatedAt, model }
     messages : 'messages',  // { id, sessionId, role, content, model, timestamp }
     memory   : 'memory',    // { key, value }  — global KV store for AI context
 };
@@ -25,9 +24,18 @@ class ChatDB {
             req.onupgradeneeded = (e) => {
                 const db = e.target.result;
 
+                let s;
                 if (!db.objectStoreNames.contains(STORES.sessions)) {
-                    const s = db.createObjectStore(STORES.sessions, { keyPath: 'id' });
+                    s = db.createObjectStore(STORES.sessions, { keyPath: 'id' });
+                } else {
+                    s = e.target.transaction.objectStore(STORES.sessions);
+                }
+                
+                if (!s.indexNames.contains('updatedAt')) {
                     s.createIndex('updatedAt', 'updatedAt');
+                }
+                if (!s.indexNames.contains('userId')) {
+                    s.createIndex('userId', 'userId');
                 }
 
                 if (!db.objectStoreNames.contains(STORES.messages)) {
@@ -72,12 +80,12 @@ class ChatDB {
 
     // ── Sessions ──────────────────────────────────────────────────────────
     
-    async createSession(title = 'New Chat', model = 'instant') {
+    async createSession(title = 'New Chat', model = 'instant', userId = 'guest') {
         await this._ready;
         const id  = `sess_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
         const now = new Date().toISOString();
         const session = { 
-            id, title, model, 
+            id, userId, title, model, 
             createdAt: now, updatedAt: now,
             isPinned: false, folderId: null 
         };
@@ -85,6 +93,7 @@ class ChatDB {
             this._db.transaction(STORES.sessions, 'readwrite')
                     .objectStore(STORES.sessions).put(session)
         );
+        await this.setMemory(`current_session_${userId}`, id);
         await this.setMemory('current_session', id);
         return session;
     }
@@ -109,17 +118,35 @@ class ChatDB {
         return session;
     }
 
-    async getAllSessions() {
+    async getAllSessions(userId = null) {
         await this._ready;
         return new Promise((resolve, reject) => {
             const tx    = this._db.transaction(STORES.sessions, 'readonly');
             const store = tx.objectStore(STORES.sessions);
-            const req   = store.index('updatedAt').openCursor(null, 'prev');
+            
+            let req;
+            if (userId && store.indexNames.contains('userId')) {
+                const index = store.index('userId');
+                req = index.openCursor(IDBKeyRange.only(userId));
+            } else {
+                req = store.index('updatedAt').openCursor(null, 'prev');
+            }
+
             const sessions = [];
             req.onsuccess = (e) => {
                 const cursor = e.target.result;
-                if (cursor) { sessions.push(cursor.value); cursor.continue(); }
-                else resolve(sessions);
+                if (cursor) {
+                    const sess = cursor.value;
+                    // Fallback filtering if needed
+                    if (!userId || sess.userId === userId || (!sess.userId && userId === 'guest')) {
+                        sessions.push(sess);
+                    }
+                    cursor.continue();
+                } else {
+                    // Sort descending by updatedAt
+                    sessions.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+                    resolve(sessions);
+                }
             };
             req.onerror = () => reject(req.error);
         });
@@ -140,6 +167,29 @@ class ChatDB {
         });
     }
 
+    async clearUserSessions(userId) {
+        await this._ready;
+        const sessions = await this.getAllSessions(userId);
+        for (const s of sessions) {
+            await this.deleteSession(s.id);
+        }
+    }
+
+    async purgeLegacySessions() {
+        await this._ready;
+        const sessions = await this.getAllSessions();
+        const legacyTitles = ["Hello Rudra! It's nice to meet you.", "Hello! How can I assist you today?"];
+        for (const s of sessions) {
+            const msgs = await this.getMessages(s.id);
+            const isLegacy = legacyTitles.includes(s.title) || 
+                             msgs.some(m => m.content && (m.content.includes("Hello! I'm just a computer program") || m.content.includes("Hello Rudra!")));
+            if (isLegacy) {
+                await this.deleteSession(s.id);
+                console.log('Purged legacy session from IndexedDB:', s.id, s.title);
+            }
+        }
+    }
+
     // ── Messages ──────────────────────────────────────────────────────────
 
     async addMessage(sessionId, role, content, extra = {}) {
@@ -155,7 +205,8 @@ class ChatDB {
             const session = await this.getSession(sessionId);
             const m = extra.model || (session ? session.model : 'instant');
             if (session && session.title === 'New Chat') {
-                await this.updateSession(sessionId, { title: 'New Chat...', model: m });
+                const titleSnippet = content.substring(0, 30).trim() || 'New Chat...';
+                await this.updateSession(sessionId, { title: titleSnippet, model: m });
             } else if (session) {
                 await this.updateSession(sessionId, { model: m });
             }
@@ -220,7 +271,6 @@ class ChatDB {
         if (!msg) return;
         Object.assign(msg, updates);
         await this._req(store.put(msg));
-        // Simple return once done
         return msg;
     }
 
@@ -262,10 +312,12 @@ class ChatDB {
         });
     }
 
-    async importSession(sessionData) {
+    async importSession(sessionData, defaultUserId = 'guest') {
         await this._ready;
         const { messages: msgs, ...session } = sessionData;
         if (!session.id) return;
+        if (!session.userId) session.userId = defaultUserId;
+
         const existing = await this.getSession(session.id);
         if (!existing) {
             await this._req(
@@ -292,27 +344,27 @@ class ChatDB {
 
     // ── Export ────────────────────────────────────────────────────────────
 
-    async exportAll() {
+    async exportAll(userId = null) {
         const [sessions, messages] = await Promise.all([
-            this.getAllSessions(),
+            this.getAllSessions(userId),
             this.getAllMessages(10000),
         ]);
         const blob = new Blob(
-            [JSON.stringify({ exportedAt: new Date().toISOString(), sessions, messages }, null, 2)],
+            [JSON.stringify({ exportedAt: new Date().toISOString(), userId, sessions, messages }, null, 2)],
             { type: 'application/json' }
         );
         const a    = document.createElement('a');
         a.href     = URL.createObjectURL(blob);
-        a.download = `kimi-chat-history-${Date.now()}.json`;
+        a.download = `markzap-chat-history-${userId || 'all'}-${Date.now()}.json`;
         a.click();
         URL.revokeObjectURL(a.href);
     }
 
     // ── Stats ─────────────────────────────────────────────────────────────
 
-    async getStats() {
+    async getStats(userId = null) {
         const [sessions, messages] = await Promise.all([
-            this.getAllSessions(),
+            this.getAllSessions(userId),
             this.getAllMessages(100000),
         ]);
         return {
@@ -327,3 +379,4 @@ class ChatDB {
 
 // Singleton export
 export const db = new ChatDB();
+

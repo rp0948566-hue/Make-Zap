@@ -1,0 +1,29 @@
+{
+  "id": "sess_1786654342998_dm4qa",
+  "userId": "guest",
+  "title": "📎 Screenshot 2026-08-14 02221",
+  "model": "agent",
+  "createdAt": "2026-08-13T20:52:22.998Z",
+  "updatedAt": "2026-08-13T20:52:23.009Z",
+  "isPinned": false,
+  "folderId": null,
+  "messages": [
+    {
+      "sessionId": "sess_1786654342998_dm4qa",
+      "role": "user",
+      "content": "📎 Screenshot 2026-08-14 022211.png\n/clone inspect clone_of_the_website_shown_in_the_image_otmtyq project",
+      "timestamp": "2026-08-13T20:52:23.008Z",
+      "model": "agent",
+      "id": 11
+    },
+    {
+      "sessionId": "sess_1786654342998_dm4qa",
+      "role": "assistant",
+      "content": "I'm sorry, but I can't access or interpret images directly. However, if you describe the content of the image or provide more details about what you need help with, I'd be happy to assist!",
+      "timestamp": "2026-08-13T20:52:23.008Z",
+      "model": "agent",
+      "interrupted": false,
+      "id": 12
+    }
+  ]
+}

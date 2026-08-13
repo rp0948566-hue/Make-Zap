@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kimi</title>
+    <title>Mark Zap</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
-    <link rel="icon" type="image/png" href="/biohazard_icon_clean.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -30,6 +31,9 @@
         </a>
         <a class="rail-item" id="nav-chat" href="javascript:void(0)" title="Chat">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </a>
+        <a class="rail-item" id="nav-clone-folder" href="javascript:void(0)" title="Clone Website Project (clone_of_the_website_shown_in_the_image_otmtyq)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         </a>
         <a class="rail-item" id="nav-new-chat-rail" href="javascript:void(0)" title="New Chat">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -83,18 +87,21 @@
         </header>
         <main class="home-main">
             <div class="hero-logo-wrap">
-                <img src="/biohazard_clean.png" alt="Biohazard Logo" class="hero-biohazard-img" draggable="false" />
+                <h1 class="hero-brand-title">Mark Zap</h1>
             </div>
             <div class="input-box" id="home-input-box" style="position:relative; z-index:50;">
                 <textarea id="home-textarea" placeholder="Ask away. Pics work too." style="position:relative; z-index:50;"></textarea>
                     <div class="input-toolbar">
                         <div class="toolbar-left">
                             <button class="plus-btn" id="home-plus-btn" title="Add File or Image"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                            <button class="reach-cmd-btn" id="home-reach-btn" title="Lead Finder (/reach)">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                <span>/reach Leads</span>
+                            </button>
                             <div id="home-file-chip" class="file-chip" style="display:none;">
                                 <span class="file-name"></span>
                                 <button class="file-remove">&times;</button>
                             </div>
-                            
                         </div>
                     <div class="toolbar-right">
                         <button class="model-btn" id="home-model-btn" title="Select Model" style="position:relative; z-index:50;display:none;"></button>
@@ -103,14 +110,6 @@
                         </button>
                     </div>
                 </div>
-            </div>
-            <div class="kimi-claw-card">
-                <div class="claw-icon">🦞</div>
-                <div class="claw-text">
-                    <div class="claw-title">Kimi Claw Is Ready!</div>
-                    <div class="claw-sub">One-click OpenClaw, Kimi works 24/7</div>
-                </div>
-                <button class="claw-arrow" title="Explore Kimi Claw"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
             </div>
         </main>
     </div>
@@ -149,6 +148,10 @@
                 <div class="input-toolbar">
                     <div class="toolbar-left">
                         <button class="plus-btn" id="chat-plus-btn" title="Add File"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+                        <button class="reach-cmd-btn" id="chat-reach-btn" title="Lead Finder (/reach)">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <span>/reach Leads</span>
+                        </button>
                         <div id="chat-file-chip" class="file-chip" style="display:none;">
                             <span class="file-name"></span>
                             <button class="file-remove">&times;</button>
@@ -189,7 +192,7 @@
 <div class="model-dropdown" id="model-dropdown">
 </div>
 
-<!-- ── SETTINGS MODAL (Premium Suite) ── -->
+<!-- ── SETTINGS MODAL ── -->
 <div class="modal-overlay" id="settings-modal-overlay">
     <div class="settings-modal">
         <button class="settings-close" id="settings-close" title="Close Settings">
@@ -201,29 +204,9 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><circle cx="12" cy="8" r="3"/></svg>
                 Account
             </div>
-            <div class="settings-nav-item" data-tab="general">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                General
-            </div>
-            <div class="settings-nav-item" data-tab="notifications">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                Notifications
-            </div>
-            <div class="settings-nav-item" data-tab="personalization">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Personalization
-            </div>
-            <div class="settings-nav-item" data-tab="apps">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-                Apps
-            </div>
-            <div class="settings-nav-item" data-tab="data">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-                Data controls
-            </div>
-            <div class="settings-nav-item" data-tab="security">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                Security
+            <div class="settings-nav-item" data-tab="appearance">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                Appearance
             </div>
         </aside>
 
@@ -240,7 +223,7 @@
                     <span class="preview-badge">Preview</span>
                 </div>
 
-                    <div class="setting-row">
+                <div class="setting-row">
                     <div class="setting-info">
                         <div class="setting-title">Name</div>
                         <div class="setting-desc">Rudra Pratap Singh (DOB: 2009/08/08)</div>
@@ -289,6 +272,22 @@
                     </label>
                 </div>
             </div>
+
+            <div id="tab-appearance" class="tab-pane">
+                <div class="setting-section">
+                    <div class="section-title">Theme Mode</div>
+                    <div class="theme-options-grid">
+                        <button class="theme-btn-option active" id="theme-dark-btn" data-theme-val="dark">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                            <span>Dark Theme</span>
+                        </button>
+                        <button class="theme-btn-option" id="theme-light-btn" data-theme-val="light">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                            <span>Light Theme</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 </div>
@@ -319,12 +318,111 @@
             </div>
         </div>
     </div>
-    <!-- CONTEXT MENU -->
-    <div id="chat-context-menu" class="context-menu">
-        <div class="menu-item" id="menu-rename"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Rename</div>
-        <div class="menu-divider"></div>
-        <div class="menu-item" id="menu-pin"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6a3 3 0 0 0-3-3 3 3 0 0 0-3 3v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24z"/></svg>Pin chat</div>
-        <div class="menu-item danger" id="menu-delete"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>Delete</div>
+    <!-- SLASH COMMANDS POPUP (Triggers when user types /) -->
+    <div id="slash-popover" class="slash-popover">
+        <div class="slash-popover-header">⚡ Slash Commands</div>
+        <div class="slash-option-list" id="slash-option-list">
+            <div class="slash-opt-item" data-cmd="/download">
+                <span class="slash-icon">📥</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/download</div>
+                    <div class="slash-opt-desc">Download complete website HTML/CSS/JS with Complete-Website-Downloader</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/researcher">
+                <span class="slash-icon">🔬</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/researcher</div>
+                    <div class="slash-opt-desc">Deep web research on any topic, market, or company via Agent Reach</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/reach">
+                <span class="slash-icon">🎯</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/reach</div>
+                    <div class="slash-opt-desc">Find business leads without websites in Indore / USA</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/clone">
+                <span class="slash-icon">📁</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/clone</div>
+                    <div class="slash-opt-desc">Open clone_of_the_website_shown_in_the_image_otmtyq project</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/lead">
+                <span class="slash-icon">💼</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/lead</div>
+                    <div class="slash-opt-desc">Search B2B sales leads & local business contacts</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/search">
+                <span class="slash-icon">🌐</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/search</div>
+                    <div class="slash-opt-desc">Real-time Web Search via Agent Reach</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/code">
+                <span class="slash-icon">💻</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/code</div>
+                    <div class="slash-opt-desc">Build web apps, scripts, or components autonomously</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/preview">
+                <span class="slash-icon">👁️</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/preview</div>
+                    <div class="slash-opt-desc">Render web app preview inside the chat view</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/help">
+                <span class="slash-icon">❓</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/help</div>
+                    <div class="slash-opt-desc">Display all Mark Zap personal assistant capabilities</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── LEFT SLIDE-IN WEBSITE PREVIEW & CODE PANEL ── -->
+    <div id="site-preview-drawer" class="site-preview-drawer">
+        <div class="drawer-header">
+            <div class="drawer-title-group">
+                <span class="drawer-icon">🌐</span>
+                <div class="drawer-title-text">
+                    <span id="drawer-site-name">Website Downloader Preview</span>
+                    <span id="drawer-site-sub" class="drawer-sub">Complete Website Inspector</span>
+                </div>
+            </div>
+            <div class="drawer-actions">
+                <button id="btn-open-newtab" class="drawer-action-btn primary" title="Open Website in New Tab">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                    <span>Open in New Tab</span>
+                </button>
+                <button id="btn-show-code" class="drawer-action-btn secondary" title="Show Source Code">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    <span id="btn-show-code-text">Show Code</span>
+                </button>
+                <button id="btn-close-drawer" class="drawer-close-btn" title="Close Panel">&times;</button>
+            </div>
+        </div>
+        
+        <div class="drawer-body">
+            <div id="preview-iframe-wrapper" class="preview-wrapper">
+                <iframe id="preview-iframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            </div>
+            <div id="preview-code-pane" class="code-pane" style="display:none;">
+                <div class="code-header">
+                    <span>Source Code Inspector</span>
+                    <button id="btn-copy-code" class="code-copy-btn">Copy Code</button>
+                </div>
+                <pre><code id="preview-code-content">Select a file to inspect code...</code></pre>
+            </div>
+        </div>
     </div>
 </body>
 </html>

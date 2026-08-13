@@ -55,8 +55,11 @@ const HISTORY_DIR = path.join(__dirname, 'history');
 })();
 
 app.post('/api/save_session', async (req, res) => {
-    const { id, data } = req.body;
+    const { id, data, userId } = req.body;
     try {
+        if (!id) return res.status(400).json({ success: false, error: 'Missing session ID' });
+        // Assign userId inside data if available
+        if (data && userId) data.userId = userId;
         const filePath = path.join(HISTORY_DIR, `${id}.json`);
         await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
         res.json({ success: true, output: `Session ${id} saved to file.` });
@@ -66,14 +69,22 @@ app.post('/api/save_session', async (req, res) => {
 });
 
 app.get('/api/load_all_sessions', async (req, res) => {
+    const requestedUserId = req.query.userId;
     try {
         const files = await fs.readdir(HISTORY_DIR);
-        const sessions = await Promise.all(
-            files.filter(f => f.endsWith('.json') && !f.startsWith('_')).map(async f => {
+        const sessions = [];
+        for (const f of files.filter(f => f.endsWith('.json') && !f.startsWith('_'))) {
+            try {
                 const content = await fs.readFile(path.join(HISTORY_DIR, f), 'utf8');
-                return JSON.parse(content);
-            })
-        );
+                const parsed = JSON.parse(content);
+                // Filter by userId if requested
+                if (!requestedUserId || parsed.userId === requestedUserId || (!parsed.userId && requestedUserId === 'guest')) {
+                    sessions.push(parsed);
+                }
+            } catch (e) {
+                console.error(`Error parsing session file ${f}:`, e.message);
+            }
+        }
         res.json({ success: true, output: sessions });
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
@@ -92,8 +103,9 @@ app.delete('/api/delete_session/:id', async (req, res) => {
 });
 
 app.get('/api/global_memory', async (req, res) => {
+    const memoryId = req.query.id || '_global_memory';
     try {
-        const filePath = path.join(HISTORY_DIR, '_global_memory.json');
+        const filePath = path.join(HISTORY_DIR, `${memoryId}.json`);
         const content = await fs.readFile(filePath, 'utf8');
         res.json({ success: true, output: JSON.parse(content) });
     } catch (err) {
@@ -103,13 +115,19 @@ app.get('/api/global_memory', async (req, res) => {
 
 app.get('/api/search_sessions', async (req, res) => {
     const query = (req.query.q || '').toLowerCase();
+    const requestedUserId = req.query.userId;
     if (!query) return res.json({ success: true, output: [] });
     try {
         const files = await fs.readdir(HISTORY_DIR);
         const results = [];
-        for (const f of files.filter(f => f.endsWith('.json'))) {
+        for (const f of files.filter(f => f.endsWith('.json') && !f.startsWith('_'))) {
             const content = await fs.readFile(path.join(HISTORY_DIR, f), 'utf8');
             const data = JSON.parse(content);
+
+            if (requestedUserId && data.userId !== requestedUserId && !(requestedUserId === 'guest' && !data.userId)) {
+                continue;
+            }
+
             const titleMatch = data.title && data.title.toLowerCase().includes(query);
             const msgMatches = (data.messages || []).filter(m => m.content && m.content.toLowerCase().includes(query));
             if (titleMatch || msgMatches.length > 0) {

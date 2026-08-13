@@ -17,10 +17,14 @@ let aiResponse       = '';
 let pendingActions   = [];
 let pendingResolve   = null;
 
-// ── USER PROFILE (Permanent Identity) ─────────────────────────────────────────
+// ── USER PROFILE & ACCOUNT ISOLATION ─────────────────────────────────────────
+let currentUserId = 'guest';
+let currentAccountUser = null;
+
 let USER_PROFILE = {
     name: 'Rudra Pratap Singh',
     shortName: 'Rudra',
+    email: 'rp0948566@gmail.com',
     dateOfBirth: '2009/08/08',
     birthYear: 2009,
     birthMonth: 8,
@@ -39,18 +43,20 @@ function getUserAge() {
 
 function getUserProfileBlock() {
     const age = getUserAge();
+    const accountInfo = currentUserId !== 'guest' ? ` (Account ID: ${currentUserId}, Email: ${USER_PROFILE.email})` : ' (Guest Mode)';
     return `
 [PERMANENT USER IDENTITY - NEVER FORGET THIS]:
-- Full Name: ${USER_PROFILE.name}
+- Full Name: ${USER_PROFILE.name}${accountInfo}
 - Called: ${USER_PROFILE.shortName}
+- Email: ${USER_PROFILE.email}
 - Date of Birth: ${USER_PROFILE.dateOfBirth}
 - Current Age: ${age} years old
 - Timezone: ${USER_PROFILE.timezone}
-- You are Rudra's PERSONAL AI ASSISTANT. You know him personally.
-- Always refer to him by name when appropriate (Rudra or Rudra Pratap Singh).
-- Remember everything about Rudra - his preferences, projects, conversations, habits.
-- You have access to ALL past conversations and can recall any detail.
-- Treat every interaction as if you are Rudra's dedicated personal assistant who never forgets.`;
+- You are ${USER_PROFILE.shortName}'s PERSONAL AI ASSISTANT. You know him personally.
+- Always refer to him by name when appropriate (${USER_PROFILE.shortName}).
+- Remember everything about ${USER_PROFILE.shortName} - his preferences, projects, conversations, habits.
+- You have access to past conversations in this account and can recall any detail.
+- Treat every interaction as if you are ${USER_PROFILE.shortName}'s dedicated personal assistant who never forgets.`;
 }
 
 // ── SYSTEM PROMPTS (Personal Assistant for Rudra Pratap Singh) ──────────────────
@@ -85,6 +91,12 @@ const COMPUTER_USE_DIRECTIVE = "YOU HAVE FULL COMPUTER CONTROL CAPABILITIES." +
 "- get_system_info: {}" +
 "- run_background: { \"command\": \"cmd\", \"args\": [\"arg1\"] }" +
 "YOU CAN OUTPUT MULTIPLE ACTION BLOCKS in a single response. Execute them sequentially." +
+"AGENT REACH CAPABILITIES INSTALLED & INTEGRATED:" +
+" You have access to Agent Reach CLI to search and read content from 13+ web platforms (Twitter/X, Reddit, YouTube, Bilibili, RSS, GitHub, Jina Web Reader, V2EX, etc.)." +
+" To fetch or search internet content using Agent Reach, execute shell commands:" +
+"- `python -m agent_reach.cli search <query>` (Searches internet platforms)" +
+"- `python -m agent_reach.cli read <url>` (Reads content from any URL or platform)" +
+"- `python -m agent_reach.cli doctor` (Diagnoses active platform connections)" +
 "AUTONOMOUS MODE: You can build entire projects without asking. Create files, write code, install packages, run commands, test, debug, fix errors, and deliver the final product. You have FULL PERMISSION to do anything on this computer." +
 "IMPORTANT: When building websites/apps, ALWAYS use 'preview' action to show the result to user in the chat embed. Use 'open' only when user explicitly asks to open in system browser.";
 
@@ -297,7 +309,12 @@ function simpleMarkdown(text) {
     };
     const closeTable = () => {
         if (inTable && tableRows.length > 0) {
-            let thtml = '<table>';
+            let thtml = `<div class="table-export-wrap">
+                <div class="table-export-bar">
+                    <button onclick="exportLeadsCSV(this)" class="export-btn csv-btn">📊 Export to CSV / Excel</button>
+                    <button onclick="exportLeadsPDF(this)" class="export-btn pdf-btn">📄 Export to PDF</button>
+                </div>
+                <table>`;
             tableRows.forEach((cells, i) => {
                 if (i === 0) {
                     thtml += '<thead><tr>' + cells.map(c => `<th>${c}</th>`).join('') + '</tr></thead><tbody>';
@@ -305,7 +322,7 @@ function simpleMarkdown(text) {
                     thtml += '<tr>' + cells.map(c => `<td>${c}</td>`).join('') + '</tr>';
                 }
             });
-            thtml += '</tbody></table>';
+            thtml += '</tbody></table></div>';
             result.push(thtml);
             inTable = false;
             tableRows = [];
@@ -496,11 +513,30 @@ tabPanes.forEach(pane => {
             const tabId = item.dataset.tab;
             settingsNavItems.forEach(nav => nav.classList.remove('active'));
             item.classList.add('active');
-            tabPanes.forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
             getEl(`tab-${tabId}`)?.classList.add('active');
         });
     });
 });
+
+// ─── Theme Management (Dark & Light Theme) ──────────────────────────────────
+let currentTheme = localStorage.getItem('app_theme') || 'dark';
+
+function applyTheme(theme) {
+    currentTheme = theme;
+    localStorage.setItem('app_theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+    
+    const darkBtn = getEl('theme-dark-btn');
+    const lightBtn = getEl('theme-light-btn');
+    if (darkBtn) darkBtn.classList.toggle('active', theme === 'dark');
+    if (lightBtn) lightBtn.classList.toggle('active', theme === 'light');
+}
+
+applyTheme(currentTheme);
+
+getEl('theme-dark-btn')?.addEventListener('click', () => applyTheme('dark'));
+getEl('theme-light-btn')?.addEventListener('click', () => applyTheme('light'));
 
 // ─── Messaging Engine ───────────────────────────────────────────────────────
 const globalFileInput = document.getElementById('global-file-input');
@@ -608,7 +644,7 @@ async function sendMessage(textOverride = null, isQueued = false) {
     }
 
     if (!currentSessionId) {
-        const session = await db.createSession('New Chat', activeModel);
+        const session = await db.createSession('New Chat', activeModel, currentUserId);
         currentSessionId = session.id;
         if (activeView !== 'chat') {
             switchToChat();
@@ -618,6 +654,110 @@ async function sendMessage(textOverride = null, isQueued = false) {
     let promptToDisplay = text;
     let promptForAI = text;
     let base64Image = null;
+
+    if (text.trim().toLowerCase().startsWith('/reach') || (text.toLowerCase().includes('lead') && text.toLowerCase().includes('website'))) {
+        const userQuery = text.trim().replace(/^\/reach/i, '').trim() || 'find businesses without website in Indore and USA';
+        promptToDisplay = text;
+        promptForAI = `LEAD FINDER DIRECTIVE - AGENT REACH TRIGGERED:
+The user wants to find local commercial business leads that DO NOT HAVE A WEBSITE.
+Target Location / Niche Query: "${userQuery}"
+
+First, execute the lead_finder.py script to extract dynamic, non-repeating commercial leads:
+\`\`\`action
+{
+  "type": "shell",
+  "params": {
+    "command": "python lead_finder.py \\"${userQuery.replace(/"/g, '')}\\""
+  }
+}
+\`\`\`
+
+When the JSON results return:
+1. Present the Lead Opportunities Table with:
+   - 🏢 Business Name
+   - 🏷️ Category / Niche
+   - 📍 Address & Location (Indore / USA)
+   - 🗺️ Google Maps Link: '[View Location on Google Maps](google_maps_link)'
+   - 📞 Phone Number & Email
+   - 🎯 Pitch Opportunity
+
+2. For each extracted lead, provide:
+   - 📧 **Custom Cold Email Pitch**: A high-converting email template written specifically for that company, pitching a custom website build and Google Local SEO to boost their revenue.
+   - 🎨 **AAA Web Design Concept**: Best-in-class UI design concept (Color scheme, Key pages, Features like WhatsApp ordering, Appointment booking, Product catalog, Google Maps integration).
+
+3. Mention clearly to Rudra:
+   - "💡 *Need a custom AI Build Prompt for any specific lead? Just ask 'Give me AI prompt for Lead #1' and I will generate a complete prompt to build their website!*"` ;
+    } else if (text.trim().toLowerCase().startsWith('/researcher') || text.trim().toLowerCase().startsWith('/research')) {
+        const query = text.trim().replace(/^\/researcher|\/research/i, '').trim() || 'Market trends and business opportunities';
+        promptToDisplay = text;
+        promptForAI = `RESEARCHER DIRECTIVE - AGENT REACH AND CUSTOM DATA TRIGGERED:
+The user requested deep web research on topic or data: "${query}"
+
+Execute Agent Reach search and research action:
+\`\`\`action
+{
+  "type": "shell",
+  "params": {
+    "command": "python -m agent_reach.cli search \\"${query.replace(/"/g, '')}\\""
+  }
+}
+\`\`\`
+
+Synthesize a comprehensive, structured Research Report for Rudra combining live web findings and any user provided data:
+1. 📊 Executive Summary & Core Insights
+2. 🔍 Deep Market & Competitor Analysis
+3. 🎨 AAA Design & Technology Recommendations
+4. 💡 Strategic Next Steps & Actionable Guidance
+5. 🌐 Verified Data Sources & References`;
+    } else if (text.toLowerCase().includes('ai prompt') || text.toLowerCase().includes('build prompt') || text.toLowerCase().includes('custom prompt')) {
+        promptToDisplay = text;
+        promptForAI = `CUSTOM AI BUILD PROMPT GENERATOR DIRECTIVE:
+The user is requesting a full, production-ready Custom AI System Prompt to build/clone a website for a lead.
+User Query: "${text}"
+
+Generate a detailed, step-by-step Custom AI Web Developer System Prompt formatted in a clean code block (\`\`\`prompt ... \`\`\`) specifying:
+1. 🎯 Product Goal & Target Audience
+2. 🎨 UI/UX Design Token System (Colors, Fonts, Layout Grid, Micro-animations)
+3. 🧩 Key Pages & Components (Hero, Services/Catalog, Google Maps Location, WhatsApp Booking, Contact Form)
+4. 💻 Full HTML/CSS/JS Technical Architecture & Responsive Breakpoints
+5. 🚀 Complete Execution Instructions to build the site with zero placeholders!`;
+    } else if (text.trim().toLowerCase().startsWith('/download') || (text.toLowerCase().includes('download') && text.toLowerCase().includes('website'))) {
+        const targetUrl = text.trim().replace(/^\/download/i, '').trim() || 'https://example.com';
+        promptToDisplay = text;
+        promptForAI = `WEBSITE DOWNLOADER DIRECTIVE - COMPLETE WEBSITE DOWNLOADER TRIGGERED:
+The user wants to download a complete website (HTML, CSS, JS, Assets) using Complete-Website-Downloader.
+Target URL: "${targetUrl}"
+
+Execute shell action:
+\`\`\`action
+{
+  "type": "shell",
+  "params": {
+    "command": "python download_website.py \\"${targetUrl.replace(/"/g, '')}\\""
+  }
+}
+\`\`\`
+
+When completed, return the download path, notify Rudra, and present the downloaded website!`;
+    } else if (text.trim().toLowerCase().startsWith('/clone')) {
+        const userQuery = text.trim().replace(/^\/clone/i, '').trim();
+        promptToDisplay = text;
+        promptForAI = `CLONE WEBSITE DIRECTIVE - FOLDER FEATURE ACCESSED:
+The user wants to inspect, explore, or build the cloned website project located in folder \`clone_of_the_website_shown_in_the_image_otmtyq\`.
+Details requested: "${userQuery || 'Inspect structure, pages, and components'}"
+
+Execute action to list files in clone_of_the_website_shown_in_the_image_otmtyq:
+\`\`\`action
+{
+  "type": "list_dir",
+  "params": {
+    "path": "clone_of_the_website_shown_in_the_image_otmtyq"
+  }
+}
+\`\`\`
+
+Summarize the cloned website features, pages in app/, components, and present the folder workspace to Rudra!`;
+    }
 
     if (attachedFile) {
         promptToDisplay = `📎 ${attachedFile.name}\n${text}`;
@@ -1196,7 +1336,7 @@ async function syncSessionToDisk(sessionId) {
         await fetch('http://localhost:3001/api/save_session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: sessionId, data: { ...session, messages: msgs } })
+            body: JSON.stringify({ id: sessionId, userId: currentUserId, data: { ...session, userId: currentUserId, messages: msgs } })
         });
         // Also persist global AI memory to disk
         await saveGlobalMemory();
@@ -1205,18 +1345,19 @@ async function syncSessionToDisk(sessionId) {
 
 async function saveGlobalMemory() {
     try {
-        const sessions = await db.getAllSessions();
+        const sessions = await db.getAllSessions(currentUserId);
         const allMsgs = await db.getAllMessages(100);
         const memoryData = {
+            userId: currentUserId,
             sessions: sessions.map(s => ({ id: s.id, title: s.title, updatedAt: s.updatedAt })),
             recentMessages: allMsgs.slice(-50).map(m => ({ role: m.role, content: m.content.substring(0, 500), sessionId: m.sessionId, timestamp: m.timestamp })),
             lastUpdated: new Date().toISOString()
         };
-        await db.setMemory('global_memory', memoryData);
+        await db.setMemory(`global_memory_${currentUserId}`, memoryData);
         await fetch('http://localhost:3001/api/save_session', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: '_global_memory', data: memoryData })
+            body: JSON.stringify({ id: `_global_memory_${currentUserId}`, userId: currentUserId, data: memoryData })
         });
     } catch (e) { /* silent fail for memory save */ }
 }
@@ -1224,7 +1365,7 @@ async function saveGlobalMemory() {
 async function renderHistory() {
     if (!historyList) return;
     try {
-        const sessions = await db.getAllSessions();
+        const sessions = await db.getAllSessions(currentUserId);
         sessions.sort((a, b) => {
             if (a.isPinned && !b.isPinned) return -1;
             if (!a.isPinned && b.isPinned) return 1;
@@ -1254,9 +1395,8 @@ function createHistoryItem(session) {
     div.dataset.id = session.id;
     div.onclick = () => { loadSession(session.id); };
     div.innerHTML = `
-        <div class="history-item-content">${escapeHtml(session.title)}</div>
-        <div class="history-item-actions">
-            ${session.isPinned ? '<span class="history-item-pin">📌</span>' : ''}
+        <div class="history-item-content">
+            <span class="history-item-title">${escapeHtml(session.title || 'New Chat')}</span>
             <div class="history-item-more">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>
             </div>
@@ -1326,6 +1466,9 @@ document.getElementById('menu-delete')?.addEventListener('click', async (e) => {
         confirmText: 'Delete',
         onConfirm: async () => {
             await db.deleteSession(contextSessionId);
+            try {
+                await fetch(`http://localhost:3001/api/delete_session/${contextSessionId}`, { method: 'DELETE' });
+            } catch {}
             if (currentSessionId === contextSessionId) {
                 currentSessionId = null;
                 messages = [];
@@ -1375,11 +1518,11 @@ async function loadSession(id) {
 }
 
 async function updateAIPersona() {
-    const sessions = await db.getAllSessions();
+    const sessions = await db.getAllSessions(currentUserId);
     const recentSummaries = sessions.slice(0, 10).map(s => s.title).join(', ');
     const recentCtx = await db.getRecentContext(40);
     let profile = getUserProfileBlock();
-    let pattern = sessions.length > 0 ? `\n[USER PATTERNS]: Rudra recently discusses: ${recentSummaries}.` : '';
+    let pattern = sessions.length > 0 ? `\n[USER PATTERNS]: ${USER_PROFILE.shortName} recently discusses: ${recentSummaries}.` : '';
     let msgPattern = recentCtx ? `\n[PAST CONVERSATION MEMORY]:\n${recentCtx.substring(0, 2000)}` : '';
     CLAUDE_SYSTEM_PROMPT = MODEL_PROMPTS[activeModel] + profile + pattern + msgPattern;
 }
@@ -1388,30 +1531,20 @@ async function updateAIPersona() {
 
 async function syncDiskToIndexedDB() {
     try {
-        const res = await fetch('http://localhost:3001/api/load_all_sessions');
+        const res = await fetch(`http://localhost:3001/api/load_all_sessions?userId=${encodeURIComponent(currentUserId)}`);
         const data = await res.json();
         if (data.success && data.output) {
             for (const sessionData of data.output) {
-                await db.importSession(sessionData);
+                await db.importSession(sessionData, currentUserId);
             }
-            console.log(`Synced ${data.output.length} sessions from disk to IndexedDB`);
+            console.log(`Synced ${data.output.length} sessions for user ${currentUserId} from disk to IndexedDB`);
         }
-        // Also load global memory
+        // Load global memory
         const memRes = await fetch('http://localhost:3001/api/global_memory');
         const memData = await memRes.json();
         if (memData.success && memData.output) {
             await db.setMemory('global_memory', memData.output);
-            console.log('Global memory restored from disk');
         }
-        // Load user profile from disk
-        try {
-            const profRes = await fetch('http://localhost:3001/api/global_memory?id=_user_profile');
-            const profData = await profRes.json();
-            if (profData.success && profData.output) {
-                await db.setMemory('user_profile', profData.output);
-                console.log('User profile restored from disk');
-            }
-        } catch {}
     } catch (e) {
         console.warn('Disk sync skipped (server may be offline):', e.message);
     }
@@ -1472,9 +1605,44 @@ modelOptions.forEach(opt => opt.addEventListener('click', () => { setActiveModel
 newChatBtn?.addEventListener('click', startNewChat);
 getEl('back-to-home-btn')?.addEventListener('click', startNewChat);
 
-popupLoginBtn?.addEventListener('click', () => {
-    window.location.href = '/login/';
-});
+function updateAccountUI(sessionUser) {
+    if (sessionUser) {
+        currentUserId = sessionUser.id;
+        currentAccountUser = sessionUser;
+        USER_PROFILE.name = sessionUser.user_metadata?.full_name || sessionUser.email.split('@')[0];
+        USER_PROFILE.shortName = USER_PROFILE.name.split(' ')[0];
+        USER_PROFILE.email = sessionUser.email;
+
+        if (popupLoginBtn) {
+            popupLoginBtn.textContent = 'Sign Out';
+            popupLoginBtn.onclick = async () => {
+                await supabase.auth.signOut();
+                window.location.reload();
+            };
+        }
+    } else {
+        currentUserId = 'guest';
+        currentAccountUser = null;
+        USER_PROFILE.name = 'Rudra Pratap Singh';
+        USER_PROFILE.shortName = 'Rudra';
+        USER_PROFILE.email = 'rp0948566@gmail.com';
+
+        if (popupLoginBtn) {
+            popupLoginBtn.textContent = 'Log in with Google';
+            popupLoginBtn.onclick = () => {
+                window.location.href = '/login/';
+            };
+        }
+    }
+
+    // Update settings pane account info if present
+    const prevName = document.querySelector('.preview-name');
+    const prevSub = document.querySelector('.preview-sub');
+    const emailRow = document.querySelector('.email-row span');
+    if (prevName) prevName.textContent = USER_PROFILE.name;
+    if (prevSub) prevSub.textContent = currentUserId !== 'guest' ? `Google Account (${USER_PROFILE.email})` : 'Personal AI Assistant (Guest Mode)';
+    if (emailRow) emailRow.textContent = USER_PROFILE.email;
+}
 
 function setRailActive(el) {
     document.querySelectorAll('.rail-item').forEach(item => item.classList.remove('active'));
@@ -1487,6 +1655,27 @@ railHome?.addEventListener('click', (e) => {
     historyPanel?.classList.remove('active');
     mainLayout?.classList.remove('history-open');
     switchToHome();
+});
+
+const homeReachBtn = document.getElementById('home-reach-btn');
+const chatReachBtn = document.getElementById('chat-reach-btn');
+
+function triggerReachCommand(ta) {
+    if (!ta) return;
+    const defaultQuery = '/reach find businesses without website in Indore and USA';
+    ta.value = defaultQuery;
+    ta.focus();
+    updateSendBtnState();
+}
+
+homeReachBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    triggerReachCommand(homeTA);
+});
+
+chatReachBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    triggerReachCommand(chatTA);
 });
 
 railChat?.addEventListener('click', (e) => {
@@ -1524,7 +1713,7 @@ document.addEventListener('click', (e) => {
     if (!isClickInside && !isModalOpen && historyPanel?.classList.contains('active')) {
         historyPanel.classList.remove('active');
         mainLayout?.classList.remove('history-open');
-        railChat?.classList.remove('active');
+        railChat?.remove?.('active');
         railHome?.classList.add('active');
     }
 });
@@ -1533,29 +1722,26 @@ document.addEventListener('click', (e) => {
     try {
         // ─── Sync Supabase session & Dynamic Profile ─────────────────────────
         const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-            const u = session.user;
-            USER_PROFILE.name = u.user_metadata.full_name || u.email;
-            USER_PROFILE.shortName = USER_PROFILE.name.split(' ')[0];
-            console.log('Authenticated via Supabase:', USER_PROFILE.name);
-        }
+        updateAccountUI(session?.user || null);
 
-        // Save user profile permanently to IndexedDB and disk
-        await db.setMemory('user_profile', USER_PROFILE);
-        try {
-            await fetch('http://localhost:3001/api/save_session', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: '_user_profile', data: USER_PROFILE })
-            });
-        } catch {}
+        // Listen for auth state changes
+        supabase.auth.onAuthStateChange(async (event, session) => {
+            updateAccountUI(session?.user || null);
+            await syncDiskToIndexedDB();
+            await renderHistory();
+        });
 
-        // Load all persisted sessions from disk into IndexedDB first
+        // Purge old mock/legacy sessions from IndexedDB
+        await db.purgeLegacySessions();
+
+        // Save user profile to memory
+        await db.setMemory(`user_profile_${currentUserId}`, USER_PROFILE);
+
+        // Load persisted sessions from disk for current account
         await syncDiskToIndexedDB();
-        
         await updateAIPersona();
         
-        // Initial Always-On check (Defaults to true if never set)
+        // Initial Always-On check
         const savedAgentMode = localStorage.getItem('is_agent_mode');
         isAgentMode = savedAgentMode === null ? true : savedAgentMode === 'true';
 
@@ -1586,3 +1772,296 @@ document.addEventListener('click', (e) => {
         homeView?.classList.add('active');
     }
 })();
+
+// ── SLASH COMMAND AUTOCOMPLETE DROPDOWN & SIDEBAR CLONE FOLDER ─────────────────────
+const slashPopover = document.getElementById('slash-popover');
+const slashOptionList = document.getElementById('slash-option-list');
+const navCloneFolder = document.getElementById('nav-clone-folder');
+
+let activeSlashIndex = 0;
+let currentSlashTargetTA = null;
+
+function showSlashPopover(ta) {
+    if (!ta || !slashPopover) return;
+    currentSlashTargetTA = ta;
+    const rect = ta.getBoundingClientRect();
+    
+    // Position floating popover directly above the active textarea
+    slashPopover.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
+    slashPopover.style.left = Math.max(20, rect.left) + 'px';
+    slashPopover.classList.add('active');
+    
+    filterSlashOptions(ta.value);
+}
+
+function hideSlashPopover() {
+    if (slashPopover) slashPopover.classList.remove('active');
+    currentSlashTargetTA = null;
+}
+
+function filterSlashOptions(text) {
+    if (!slashOptionList) return;
+    const search = text.toLowerCase().trim();
+    const items = slashOptionList.querySelectorAll('.slash-opt-item');
+    let visibleCount = 0;
+    
+    items.forEach((item, index) => {
+        const cmd = item.getAttribute('data-cmd') || '';
+        const name = item.querySelector('.slash-opt-name')?.textContent || '';
+        const desc = item.querySelector('.slash-opt-desc')?.textContent || '';
+        
+        if (search === '/' || cmd.toLowerCase().includes(search) || name.toLowerCase().includes(search) || desc.toLowerCase().includes(search)) {
+            item.style.display = 'flex';
+            if (visibleCount === 0) {
+                items.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                activeSlashIndex = index;
+            }
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+    
+    if (visibleCount === 0) {
+        hideSlashPopover();
+    }
+}
+
+function selectSlashOption(cmd) {
+    if (!currentSlashTargetTA) currentSlashTargetTA = activeView === 'home' ? homeTA : chatTA;
+    if (!currentSlashTargetTA) return;
+    
+    if (cmd === '/reach') {
+        currentSlashTargetTA.value = '/reach find businesses without website in Indore and USA';
+    } else if (cmd === '/clone') {
+        currentSlashTargetTA.value = '/clone inspect clone_of_the_website_shown_in_the_image_otmtyq project';
+    } else {
+        currentSlashTargetTA.value = cmd + ' ';
+    }
+    
+    hideSlashPopover();
+    currentSlashTargetTA.focus();
+    updateSendBtnState();
+}
+
+// Bind input event on textareas for / typing trigger
+[homeTA, chatTA].forEach(ta => {
+    if (!ta) return;
+    ta.addEventListener('input', () => {
+        const val = ta.value;
+        if (val.startsWith('/')) {
+            showSlashPopover(ta);
+        } else {
+            hideSlashPopover();
+        }
+    });
+    
+    ta.addEventListener('keydown', (e) => {
+        if (!slashPopover || !slashPopover.classList.contains('active')) return;
+        
+        const items = Array.from(slashOptionList.querySelectorAll('.slash-opt-item')).filter(i => i.style.display !== 'none');
+        if (items.length === 0) return;
+        
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            items[activeSlashIndex]?.classList.remove('active');
+            activeSlashIndex = (activeSlashIndex + 1) % items.length;
+            items[activeSlashIndex]?.classList.add('active');
+            items[activeSlashIndex]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            items[activeSlashIndex]?.classList.remove('active');
+            activeSlashIndex = (activeSlashIndex - 1 + items.length) % items.length;
+            items[activeSlashIndex]?.classList.add('active');
+            items[activeSlashIndex]?.scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'Enter' || e.key === 'Tab') {
+            e.preventDefault();
+            const selectedCmd = items[activeSlashIndex]?.getAttribute('data-cmd');
+            if (selectedCmd) selectSlashOption(selectedCmd);
+        } else if (e.key === 'Escape') {
+            hideSlashPopover();
+        }
+    });
+});
+
+// Click handlers for slash option items
+slashOptionList?.querySelectorAll('.slash-opt-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const cmd = item.getAttribute('data-cmd');
+        if (cmd) selectSlashOption(cmd);
+    });
+});
+
+// Hide slash popover when clicking outside
+document.addEventListener('click', (e) => {
+    if (slashPopover && !slashPopover.contains(e.target) && e.target !== homeTA && e.target !== chatTA) {
+        hideSlashPopover();
+    }
+    const link = e.target.closest('a');
+    if (link && link.href && !link.getAttribute('target')) {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+    }
+});
+
+// Sidebar Rail Item: Clone Website Folder Page Access
+navCloneFolder?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setRailActive(navCloneFolder);
+    historyPanel?.classList.remove('active');
+    mainLayout?.classList.remove('history-open');
+    if (activeView !== 'chat') switchToChat();
+    
+    // Automatically trigger /clone action to inspect the folder
+    sendMessage('/clone inspect clone_of_the_website_shown_in_the_image_otmtyq');
+});
+
+// ── SITE PREVIEW DRAWER CONTROLLER ───────────────────────────────────────
+const sitePreviewDrawer = document.getElementById('site-preview-drawer');
+const previewIframeWrapper = document.getElementById('preview-iframe-wrapper');
+const previewIframe = document.getElementById('preview-iframe');
+const previewCodePane = document.getElementById('preview-code-pane');
+const previewCodeContent = document.getElementById('preview-code-content');
+const btnOpenNewtab = document.getElementById('btn-open-newtab');
+const btnShowCode = document.getElementById('btn-show-code');
+const btnShowCodeText = document.getElementById('btn-show-code-text');
+const btnCloseDrawer = document.getElementById('btn-close-drawer');
+const btnCopyCode = document.getElementById('btn-copy-code');
+const drawerSiteName = document.getElementById('drawer-site-name');
+const drawerSiteSub = document.getElementById('drawer-site-sub');
+
+let currentDrawerTargetUrl = 'about:blank';
+let isCodeViewShowing = false;
+
+window.openSiteDrawer = async function(urlOrPath, title = 'Downloaded Site', sub = 'Complete Website Inspector') {
+    if (!sitePreviewDrawer) return;
+    currentDrawerTargetUrl = urlOrPath;
+    if (drawerSiteName) drawerSiteName.textContent = title;
+    if (drawerSiteSub) drawerSiteSub.textContent = sub;
+    
+    if (previewIframe) previewIframe.src = urlOrPath;
+    
+    // Fetch source code for inspector pane
+    try {
+        const res = await fetch(urlOrPath);
+        if (res.ok) {
+            const code = await res.text();
+            if (previewCodeContent) previewCodeContent.textContent = code;
+        } else {
+            if (previewCodeContent) previewCodeContent.textContent = `// Local path: ${urlOrPath}\n// Click "Open in New Tab" to launch directly.`;
+        }
+    } catch {
+        if (previewCodeContent) previewCodeContent.textContent = `// File: ${urlOrPath}\n// Source code ready for live inspection.`;
+    }
+    
+    sitePreviewDrawer.classList.add('active');
+};
+
+window.closeSiteDrawer = function() {
+    if (sitePreviewDrawer) sitePreviewDrawer.classList.remove('active');
+};
+
+btnOpenNewtab?.addEventListener('click', () => {
+    if (currentDrawerTargetUrl && currentDrawerTargetUrl !== 'about:blank') {
+        window.open(currentDrawerTargetUrl, '_blank');
+    }
+});
+
+btnShowCode?.addEventListener('click', () => {
+    isCodeViewShowing = !isCodeViewShowing;
+    if (isCodeViewShowing) {
+        if (previewIframeWrapper) previewIframeWrapper.style.display = 'none';
+        if (previewCodePane) previewCodePane.style.display = 'flex';
+        if (btnShowCodeText) btnShowCodeText.textContent = 'Show Preview';
+    } else {
+        if (previewIframeWrapper) previewIframeWrapper.style.display = 'block';
+        if (previewCodePane) previewCodePane.style.display = 'none';
+        if (btnShowCodeText) btnShowCodeText.textContent = 'Show Code';
+    }
+});
+
+btnCloseDrawer?.addEventListener('click', () => {
+    window.closeSiteDrawer();
+});
+
+btnCopyCode?.addEventListener('click', () => {
+    if (previewCodeContent?.textContent) {
+        navigator.clipboard.writeText(previewCodeContent.textContent);
+        btnCopyCode.textContent = 'Copied!';
+        setTimeout(() => { btnCopyCode.textContent = 'Copy Code'; }, 2000);
+    }
+});
+
+// ── GLOBAL TABLE EXPORT HANDLERS (CSV & PDF) ─────────────────────────────
+window.exportLeadsCSV = function(btn) {
+    const table = btn.closest('.table-export-wrap')?.querySelector('table') || btn.closest('.message-row')?.querySelector('table');
+    if (!table) return;
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    rows.forEach(r => {
+        const cols = r.querySelectorAll('th, td');
+        const rowData = [];
+        cols.forEach(c => rowData.push('"' + c.innerText.replace(/"/g, '""').trim() + '"'));
+        csv.push(rowData.join(','));
+    });
+    const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `MarkZap_Leads_${Date.now()}.csv`;
+    a.click();
+};
+
+window.exportLeadsPDF = function(btn) {
+    const tableWrap = btn.closest('.table-export-wrap') || btn.closest('.message-row');
+    const table = tableWrap?.querySelector('table');
+    if (!table) return;
+
+    btn.textContent = '⏳ Generating PDF...';
+
+    const element = document.createElement('div');
+    element.style.padding = '20px';
+    element.style.fontFamily = 'Arial, sans-serif';
+    element.style.color = '#1e293b';
+    element.style.background = '#ffffff';
+    element.innerHTML = `
+        <div style="border-bottom: 2px solid #2563eb; padding-bottom: 8px; margin-bottom: 12px;">
+            <h2 style="color: #2563eb; margin: 0; font-size: 18px; font-weight: bold;">🏢 Mark Zap - Business Leads Report</h2>
+            <p style="color: #64748b; font-size: 11px; margin: 4px 0 0 0;">Generated on ${new Date().toLocaleString()} by Rudra Pratap Singh</p>
+        </div>
+        <style>
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+            th, td { border: 1px solid #cbd5e1; padding: 6px 8px; text-align: left; font-size: 10px; word-break: break-word; }
+            th { background: #f1f5f9; color: #0f172a; font-weight: bold; }
+            a { color: #2563eb; text-decoration: underline; }
+        </style>
+        ${table.outerHTML}
+    `;
+
+    const opt = {
+        margin:       [0.4, 0.4, 0.4, 0.4],
+        filename:     `MarkZap_Leads_${Date.now()}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+    };
+
+    if (window.html2pdf) {
+        window.html2pdf().set(opt).from(element).save().then(() => {
+            btn.textContent = '📄 Download PDF';
+        }).catch(() => {
+            btn.textContent = '📄 Download PDF';
+        });
+    } else {
+        const htmlContent = element.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `MarkZap_Leads_${Date.now()}.pdf`;
+        a.click();
+        btn.textContent = '📄 Download PDF';
+    }
+};

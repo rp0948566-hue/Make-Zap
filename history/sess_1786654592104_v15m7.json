@@ -1,0 +1,29 @@
+{
+  "id": "sess_1786654592104_v15m7",
+  "userId": "guest",
+  "title": "/reach find businesses without",
+  "model": "agent",
+  "createdAt": "2026-08-13T20:56:32.104Z",
+  "updatedAt": "2026-08-13T20:56:32.110Z",
+  "isPinned": false,
+  "folderId": null,
+  "messages": [
+    {
+      "sessionId": "sess_1786654592104_v15m7",
+      "role": "user",
+      "content": "/reach find businesses without website in Indore main indore one i wnat all data how do not ahve website now and good rating like cae and all cloth shop and all",
+      "timestamp": "2026-08-13T20:56:32.108Z",
+      "model": "agent",
+      "id": 21
+    },
+    {
+      "sessionId": "sess_1786654592104_v15m7",
+      "role": "assistant",
+      "content": "",
+      "timestamp": "2026-08-13T20:56:32.108Z",
+      "model": "agent",
+      "interrupted": true,
+      "id": 22
+    }
+  ]
+}
