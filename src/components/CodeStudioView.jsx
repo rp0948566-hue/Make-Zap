@@ -8,7 +8,7 @@ export const CodeStudioView = ({ initialQuery }) => {
     { 
       id: 2, 
       sender: 'ai', 
-      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Preview panel active.` 
+      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Code panel active.` 
     }
   ]);
   const [deviceMode, setDeviceMode] = useState('mobile'); // Default to Mobile Phone Size
@@ -298,7 +298,7 @@ export const CodeStudioView = ({ initialQuery }) => {
 
         {/* Panel Main Area: Render Code View OR Preview Mode */}
         {panelTabMode === 'code' ? (
-          /* CODE VIEW STRUCTURE (Folder/File Explorer + Empty Code Canvas) */
+          /* CLEAN EMPTY CODE VIEW STRUCTURE */
           <div
             style={{
               flex: 1,
@@ -308,10 +308,10 @@ export const CodeStudioView = ({ initialQuery }) => {
               backgroundColor: '#070908'
             }}
           >
-            {/* File Explorer Tree Sidebar */}
+            {/* File Explorer Tree Sidebar (Clean Empty Layout Structure) */}
             <div
               style={{
-                width: '200px',
+                width: '180px',
                 backgroundColor: 'rgba(12, 16, 14, 0.95)',
                 borderRight: '1px solid rgba(255, 255, 255, 0.08)',
                 padding: '16px 12px',
@@ -326,28 +326,9 @@ export const CodeStudioView = ({ initialQuery }) => {
               <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.4)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 EXPLORER
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#30D158', fontWeight: 600 }}>
-                  <span>📁 src</span>
-                </div>
-                <div style={{ paddingLeft: '14px', display: 'flex', flexDirection: 'column', gap: '6px', color: 'rgba(255, 255, 255, 0.75)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span>📁 components</span>
-                  </div>
-                  <div style={{ paddingLeft: '14px', display: 'flex', flexDirection: 'column', gap: '6px', color: 'rgba(255, 255, 255, 0.6)' }}>
-                    <span>📄 SearchInputBox.jsx</span>
-                    <span>📄 ChatView.jsx</span>
-                    <span>📄 CodeStudioView.jsx</span>
-                  </div>
-                  <span>📄 App.jsx</span>
-                  <span>📄 main.jsx</span>
-                  <span>📄 index.css</span>
-                </div>
-              </div>
             </div>
 
-            {/* Empty Code Canvas Structure */}
+            {/* Clean Empty Code Canvas Structure */}
             <div
               style={{
                 flex: 1,
@@ -360,23 +341,23 @@ export const CodeStudioView = ({ initialQuery }) => {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '12px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
                 <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'monospace' }}>
-                  Code Structure Canvas — Empty File Workspace
+                  Code Workspace — Empty Structure
                 </span>
               </div>
               <div
                 style={{
                   flex: 1,
                   marginTop: '16px',
-                  border: '1px dashed rgba(255, 255, 255, 0.1)',
+                  border: '1px dashed rgba(255, 255, 255, 0.08)',
                   borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: 'rgba(255, 255, 255, 0.35)',
+                  color: 'rgba(255, 255, 255, 0.25)',
                   fontSize: '13.5px'
                 }}
               >
-                Structure Ready — Select a file to view code
+                Clean Empty Workspace Area
               </div>
             </div>
           </div>
