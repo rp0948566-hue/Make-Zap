@@ -118,7 +118,7 @@ export const ChatView = ({ initialQuery }) => {
             );
           }
 
-          /* AI Response: Dynamic Mark Zap AI Intelligence Output */
+          /* AI Response: Dynamic Mark Zap AI Agent-Reach Output */
           return (
             <div 
               key={msg.id}
@@ -140,15 +140,15 @@ export const ChatView = ({ initialQuery }) => {
                   paddingLeft: '4px'
                 }}
               >
-                Mark Zap AI Engine
+                Mark Zap Agent-Reach AI Engine
               </div>
 
               {/* AI Response Text */}
               <div 
                 style={{
-                  maxWidth: '90%',
+                  width: '100%',
                   color: '#ffffff',
-                  fontSize: '16px',
+                  fontSize: '15px',
                   lineHeight: '1.6',
                   fontWeight: 400,
                   paddingLeft: '4px',
@@ -157,6 +157,72 @@ export const ChatView = ({ initialQuery }) => {
               >
                 {msg.text}
               </div>
+
+              {/* Agent-Reach Interactive Prospect Lead Cards */}
+              {msg.leads && msg.leads.length > 0 && (
+                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', gap: '14px', marginTop: '16px' }}>
+                  {msg.leads.map((lead, lIdx) => (
+                    <div
+                      key={lIdx}
+                      style={{
+                        backgroundColor: 'rgba(14, 18, 16, 0.95)',
+                        border: '1px solid rgba(255, 255, 255, 0.14)',
+                        borderRadius: '16px',
+                        padding: '18px 20px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.4)'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div>
+                          <div style={{ fontSize: '17px', fontWeight: 700, color: '#ffffff' }}>{lead.name}</div>
+                          <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.6)', marginTop: '2px' }}>
+                            {lead.type} • {lead.location}
+                          </div>
+                        </div>
+                        <span style={{ fontSize: '11.5px', fontWeight: 700, color: '#ff453a', backgroundColor: 'rgba(255, 69, 58, 0.15)', padding: '4px 10px', borderRadius: '8px' }}>
+                          {lead.websiteStatus}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '13px', color: 'rgba(255, 255, 255, 0.85)', paddingTop: '4px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div><strong>Phone:</strong> <a href={`tel:${lead.phone}`} style={{ color: '#30D158', textDecoration: 'none' }}>{lead.phone}</a></div>
+                        <div><strong>Email:</strong> <a href={`mailto:${lead.email}`} style={{ color: '#0A84FF', textDecoration: 'none' }}>{lead.email}</a></div>
+                        <div><strong>Rating:</strong> {lead.rating}</div>
+                      </div>
+
+                      <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.65)' }}>
+                        <strong>Social Profiles:</strong> {lead.social}
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
+                        <a
+                          href={lead.gmapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            backgroundColor: 'rgba(10, 132, 255, 0.18)',
+                            color: '#0A84FF',
+                            border: '1px solid rgba(10, 132, 255, 0.3)',
+                            borderRadius: '8px',
+                            padding: '6px 14px',
+                            fontSize: '12.5px',
+                            fontWeight: 600,
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          📍 Open in Google Maps
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
@@ -177,7 +243,7 @@ export const ChatView = ({ initialQuery }) => {
       >
         <SearchInputBox 
           onSubmit={handleSendFollowUp} 
-          placeholder="Ask a follow-up question..." 
+          placeholder="Search businesses without a website in any location..." 
         />
       </div>
     </div>
