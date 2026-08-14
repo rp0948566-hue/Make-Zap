@@ -8,10 +8,10 @@ export const CodeStudioView = ({ initialQuery }) => {
     { 
       id: 2, 
       sender: 'ai', 
-      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Phone preview active.` 
+      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Display active.` 
     }
   ]);
-  const [deviceMode, setDeviceMode] = useState('mobile'); // Default to Mobile Phone Size
+  const [deviceMode, setDeviceMode] = useState('mobile'); // 'mobile' | 'desktop'
   const [panelTabMode, setPanelTabMode] = useState('preview'); // 'preview' | 'code'
   const [isPaneVisible, setIsPaneVisible] = useState(true);
 
@@ -21,7 +21,7 @@ export const CodeStudioView = ({ initialQuery }) => {
     const aiMsg = {
       id: Date.now() + 1,
       sender: 'ai',
-      text: `Updated code configuration for "${queryText}". Panel updated.`
+      text: `Updated code configuration for "${queryText}". Display updated.`
     };
     setMessages((prev) => [...prev, userMsg, aiMsg]);
   };
@@ -142,7 +142,7 @@ export const CodeStudioView = ({ initialQuery }) => {
                     borderRadius: '16px 16px 2px 16px',
                     fontSize: '15px',
                     lineHeight: '1.45',
-                    maxWidth: isPaneVisible ? '90%' : '600px'
+                    maxWidth: isPaneVisible ? (isMobileMode ? '90%' : '600px') : '728px'
                   }}
                 >
                   {msg.text}
@@ -153,7 +153,7 @@ export const CodeStudioView = ({ initialQuery }) => {
                     color: 'rgba(255, 255, 255, 0.9)',
                     fontSize: '15px',
                     lineHeight: '1.55',
-                    maxWidth: isPaneVisible ? '95%' : '700px'
+                    maxWidth: isPaneVisible ? (isMobileMode ? '95%' : '700px') : '780px'
                   }}
                 >
                   {msg.text}
@@ -172,11 +172,11 @@ export const CodeStudioView = ({ initialQuery }) => {
         </div>
       </div>
 
-      {/* Right Column: Toggleable Panel (Preview OR Code View) */}
+      {/* Right Column: Increased Phone Panel Width (480px in Phone Mode) */}
       <div
         style={{
           flex: isPaneVisible ? (panelTabMode === 'code' ? 1 : (isMobileMode ? 'none' : 1)) : 0,
-          width: isPaneVisible ? (panelTabMode === 'code' ? 'auto' : (isMobileMode ? '390px' : 'auto')) : '0px',
+          width: isPaneVisible ? (panelTabMode === 'code' ? 'auto' : (isMobileMode ? '480px' : 'auto')) : '0px',
           height: '100vh',
           backgroundColor: 'rgba(4, 6, 5, 0.85)',
           backdropFilter: 'blur(12px)',
@@ -190,7 +190,7 @@ export const CodeStudioView = ({ initialQuery }) => {
           transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        {/* Right Panel Control Header Bar with Preview & Code Tabs */}
+        {/* Right Panel Control Header Bar with Preview/Code Tabs + Device Switcher */}
         <div
           style={{
             height: '52px',
@@ -239,21 +239,22 @@ export const CodeStudioView = ({ initialQuery }) => {
             </button>
           </div>
 
-          {/* Right Sub-Controls: Device Toggle + Hide Pane */}
+          {/* Right Sub-Controls: Phone & Desktop Device Toggle + Hide Pane */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {panelTabMode === 'preview' && (
-              <div style={{ display: 'flex', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '2px' }}>
+              <div style={{ display: 'flex', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '2px', gap: '2px' }}>
                 <button
                   onClick={() => setDeviceMode('mobile')}
                   style={{
-                    backgroundColor: isMobileMode ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                    color: '#ffffff',
+                    backgroundColor: isMobileMode ? '#ffffff' : 'transparent',
+                    color: isMobileMode ? '#000000' : 'rgba(255, 255, 255, 0.7)',
                     border: 'none',
                     borderRadius: '6px',
-                    padding: '3px 8px',
-                    fontSize: '11.5px',
+                    padding: '4px 10px',
+                    fontSize: '12px',
                     fontWeight: 600,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                   }}
                 >
                   📱 Phone
@@ -261,14 +262,15 @@ export const CodeStudioView = ({ initialQuery }) => {
                 <button
                   onClick={() => setDeviceMode('desktop')}
                   style={{
-                    backgroundColor: !isMobileMode ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
-                    color: '#ffffff',
+                    backgroundColor: !isMobileMode ? '#ffffff' : 'transparent',
+                    color: !isMobileMode ? '#000000' : 'rgba(255, 255, 255, 0.7)',
                     border: 'none',
                     borderRadius: '6px',
-                    padding: '3px 8px',
-                    fontSize: '11.5px',
+                    padding: '4px 10px',
+                    fontSize: '12px',
                     fontWeight: 600,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
                   }}
                 >
                   🖥️ Desktop
@@ -276,10 +278,10 @@ export const CodeStudioView = ({ initialQuery }) => {
               </div>
             )}
 
-            {/* Toggle Pane Hide Button */}
+            {/* Hide Pane Button */}
             <button
               onClick={() => setIsPaneVisible(false)}
-              title="Hide Pane"
+              title="Hide Display Pane"
               style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',
                 color: '#ffffff',
@@ -296,7 +298,7 @@ export const CodeStudioView = ({ initialQuery }) => {
           </div>
         </div>
 
-        {/* Panel Main Area: Render Code View OR Preview Mode */}
+        {/* Panel Main Area: Code View OR Pure OLED Display Mode */}
         {panelTabMode === 'code' ? (
           /* CLEAN EMPTY CODE VIEW STRUCTURE */
           <div
@@ -362,166 +364,198 @@ export const CodeStudioView = ({ initialQuery }) => {
             </div>
           </div>
         ) : (
-          /* REALISTIC SMARTPHONE HARDWARE PREVIEW DISPLAY MODE */
+          /* PREVIEW DISPLAY MODE: ULTRA-REALISTIC HARDWARE CHASSIS BODY (PURE BLACK INSIDE) */
           <div
             style={{
               flex: 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: isMobileMode ? '14px 10px' : '32px',
+              padding: isMobileMode ? '16px' : '32px 40px',
               backgroundColor: 'rgba(0, 0, 0, 0.92)',
               position: 'relative',
               overflow: 'hidden'
             }}
           >
-            {/* Phone Outer Chassis with Physical Side Hardware Buttons */}
-            <div
-              style={{
-                position: 'relative',
-                width: isMobileMode ? '340px' : '100%',
-                height: isMobileMode ? '680px' : '100%',
-                maxHeight: isMobileMode ? '680px' : '100%',
-                transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-              }}
-            >
-              {/* Left Side Hardware Buttons (Volume Keys) */}
-              {isMobileMode && (
-                <>
-                  <div style={{ position: 'absolute', left: '-15px', top: '110px', width: '4px', height: '42px', backgroundColor: '#2a322c', borderRadius: '3px 0 0 3px', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }} />
-                  <div style={{ position: 'absolute', left: '-15px', top: '165px', width: '4px', height: '42px', backgroundColor: '#2a322c', borderRadius: '3px 0 0 3px', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }} />
-                </>
-              )}
-
-              {/* Right Side Hardware Button (Power Lock Key) */}
-              {isMobileMode && (
-                <div style={{ position: 'absolute', right: '-15px', top: '130px', width: '4px', height: '58px', backgroundColor: '#2a322c', borderRadius: '0 3px 3px 0', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }} />
-              )}
-
-              {/* Main Phone Glass Screen Container */}
+            {isMobileMode ? (
+              /* HYPER-REALISTIC 3D PHYSICAL SMARTPHONE HARDWARE CHASSIS */
               <div
                 style={{
-                  width: '100%',
-                  height: '100%',
-                  backgroundColor: '#020302', // True OLED Black screen
-                  border: isMobileMode ? '11px solid #1d221f' : '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: isMobileMode ? '48px' : '16px',
-                  boxShadow: isMobileMode 
-                    ? '0 25px 70px rgba(0, 0, 0, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(0,0,0,0.8)' 
-                    : '0 30px 80px rgba(0, 0, 0, 0.8)',
-                  display: 'flex',
-                  flexDirection: 'column',
                   position: 'relative',
-                  overflow: 'hidden',
-                  boxSizing: 'border-box'
+                  width: '420px',
+                  height: '100%',
+                  maxHeight: 'calc(100vh - 84px)',
+                  transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                {/* Top Status Bar (Clock, Camera Notch, WiFi, Battery) */}
-                {isMobileMode && (
+                {/* 3D Extruded Mute / Ring Switch */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    left: '-8px', 
+                    top: '85px', 
+                    width: '6px', 
+                    height: '24px', 
+                    background: 'linear-gradient(180deg, #48544c 0%, #1e2520 100%)', 
+                    borderRadius: '4px 0 0 4px',
+                    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), -4px 2px 8px rgba(0,0,0,0.9)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }} 
+                >
+                  <div style={{ width: '2px', height: '8px', backgroundColor: '#ff453a', borderRadius: '1px', boxShadow: '0 0 4px #ff453a' }} />
+                </div>
+
+                {/* 3D Extruded Volume Up Button */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    left: '-8px', 
+                    top: '135px', 
+                    width: '6px', 
+                    height: '52px', 
+                    background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', 
+                    borderRadius: '4px 0 0 4px',
+                    boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), -4px 3px 8px rgba(0,0,0,0.95)' 
+                  }} 
+                />
+
+                {/* 3D Extruded Volume Down Button */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    left: '-8px', 
+                    top: '202px', 
+                    width: '6px', 
+                    height: '52px', 
+                    background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', 
+                    borderRadius: '4px 0 0 4px',
+                    boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), -4px 3px 8px rgba(0,0,0,0.95)' 
+                  }} 
+                />
+
+                {/* 3D Extruded Power / Lock Key */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    right: '-8px', 
+                    top: '150px', 
+                    width: '6px', 
+                    height: '74px', 
+                    background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', 
+                    borderRadius: '0 4px 4px 0',
+                    boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), 4px 3px 8px rgba(0,0,0,0.95)' 
+                  }} 
+                />
+
+                {/* SIM Card Tray Ejection Slot */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    right: '-2px', 
+                    top: '280px', 
+                    width: '3px', 
+                    height: '32px', 
+                    backgroundColor: '#161c18', 
+                    borderRadius: '0 2px 2px 0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }} 
+                >
+                  <div style={{ width: '1.5px', height: '3px', backgroundColor: '#090d10', borderRadius: '50%' }} />
+                </div>
+
+                {/* Antenna Band Cutouts */}
+                <div style={{ position: 'absolute', top: '50px', left: '-10px', width: '4px', height: '5px', backgroundColor: '#111613' }} />
+                <div style={{ position: 'absolute', top: '50px', right: '-10px', width: '4px', height: '5px', backgroundColor: '#111613' }} />
+
+                {/* Main Physical Phone Outer Frame & Curved OLED Screen Container */}
+                <div
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    backgroundColor: '#000000',
+                    background: 'linear-gradient(145deg, #2b332d 0%, #151a17 40%, #0a0e0c 100%)',
+                    border: '12px solid #1c221e',
+                    borderRadius: '52px',
+                    boxShadow: '0 40px 100px rgba(0, 0, 0, 0.95), inset 0 0 0 2px rgba(255, 255, 255, 0.25), inset 0 0 14px rgba(255, 255, 255, 0.1)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {/* Curved Glass Lens Glossy Highlight Overlay */}
                   <div
                     style={{
-                      height: '44px',
-                      width: '100%',
-                      padding: '0 20px',
-                      boxSizing: 'border-box',
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 40%, rgba(255,255,255,0) 65%)',
+                      pointerEvents: 'none',
+                      zIndex: 25
+                    }}
+                  />
+
+                  {/* Top Dynamic Island Camera Notch & Sensors */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: '12px',
+                      transform: 'translateX(-50%)',
+                      width: '110px',
+                      height: '26px',
+                      backgroundColor: '#000000',
+                      borderRadius: '18px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'space-between',
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
+                      padding: '0 12px',
                       zIndex: 30,
-                      fontSize: '11px',
-                      fontWeight: 600,
-                      color: '#ffffff',
-                      userSelect: 'none'
+                      boxShadow: '0 2px 8px rgba(0,0,0,0.9)'
                     }}
                   >
-                    {/* Left: Clock */}
-                    <span style={{ fontFamily: 'sans-serif', letterSpacing: '-0.2px', marginTop: '6px' }}>9:41</span>
-
-                    {/* Center: Dynamic Island Camera Notch */}
-                    <div
-                      style={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '10px',
-                        transform: 'translateX(-50%)',
-                        width: '96px',
-                        height: '24px',
-                        backgroundColor: '#000000',
-                        borderRadius: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0 10px',
-                        boxShadow: '0 0 4px rgba(0,0,0,0.8)'
-                      }}
-                    >
-                      {/* Camera Lens dot */}
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#090d10', border: '1px solid #1a221d' }} />
-                      {/* Speaker mesh dot */}
-                      <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#090d10' }} />
-                    </div>
-
-                    {/* Right: 5G Signal, WiFi, Battery Icons */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
-                      <span style={{ fontSize: '10px' }}>5G</span>
-                      <div style={{ display: 'flex', gap: '1.5px', alignItems: 'flex-end', height: '10px' }}>
-                        <div style={{ width: '2px', height: '4px', backgroundColor: '#fff' }} />
-                        <div style={{ width: '2px', height: '6px', backgroundColor: '#fff' }} />
-                        <div style={{ width: '2px', height: '8px', backgroundColor: '#fff' }} />
-                        <div style={{ width: '2px', height: '10px', backgroundColor: '#fff' }} />
-                      </div>
-                      <div style={{ width: '18px', height: '9px', border: '1px solid #fff', borderRadius: '3px', padding: '1px', display: 'flex' }}>
-                        <div style={{ flex: 1, backgroundColor: '#30D158', borderRadius: '1px' }} />
-                      </div>
-                    </div>
+                    <div style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: '#090d10', border: '1px solid #1a221d', boxShadow: 'inset 0 0 2px #30D158' }} />
+                    <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#090d10' }} />
                   </div>
-                )}
 
-                {/* Phone Screen Display Content Canvas */}
-                <div
-                  style={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: isMobileMode ? '54px 20px 30px 20px' : '24px',
-                    boxSizing: 'border-box',
-                    gap: '16px',
-                    textAlign: 'center'
-                  }}
-                >
+                  {/* PURE CLEAN OLED BLACK SCREEN CANVAS */}
+                  <div style={{ flex: 1, backgroundColor: '#000000' }} />
+
+                  {/* Bottom USB-C Port & Speaker Grill Connectors */}
                   <div
                     style={{
-                      width: '56px',
-                      height: '56px',
-                      borderRadius: '50%',
-                      backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      position: 'absolute',
+                      bottom: '2px',
+                      left: 0,
+                      right: 0,
+                      height: '8px',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      color: '#30D158',
-                      boxShadow: '0 10px 24px rgba(0,0,0,0.5)'
+                      gap: '12px',
+                      zIndex: 20
                     }}
                   >
-                    <CodeIcon className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: '15px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
-                      {isMobileMode ? 'Smartphone Display Active' : 'Desktop View Active'}
+                    <div style={{ display: 'flex', gap: '3px' }}>
+                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
+                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
+                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
                     </div>
-                    <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.4)', maxWidth: '240px', lineHeight: '1.4' }}>
-                      True OLED Black Screen — Live code execution display ready.
-                    </div>
-                  </div>
-                </div>
 
-                {/* Bottom iOS Swipe Home Bar */}
-                {isMobileMode && (
+                    <div style={{ width: '18px', height: '3.5px', backgroundColor: '#111613', borderRadius: '2px', border: '0.5px solid rgba(255,255,255,0.1)' }} />
+
+                    <div style={{ display: 'flex', gap: '3px' }}>
+                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
+                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
+                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
+                    </div>
+                  </div>
+
+                  {/* Bottom iOS Swipe Home Bar */}
                   <div
                     style={{
                       height: '20px',
@@ -530,23 +564,120 @@ export const CodeStudioView = ({ initialQuery }) => {
                       alignItems: 'center',
                       justifyContent: 'center',
                       position: 'absolute',
-                      bottom: '4px',
+                      bottom: '6px',
                       left: 0,
                       zIndex: 30
                     }}
                   >
-                    <div
-                      style={{
-                        width: '115px',
-                        height: '4px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
-                        borderRadius: '2px'
-                      }}
-                    />
+                    <div style={{ width: '130px', height: '4.5px', backgroundColor: 'rgba(255, 255, 255, 0.85)', borderRadius: '2.5px', boxShadow: '0 1px 3px rgba(0,0,0,0.8)' }} />
                   </div>
-                )}
+                </div>
               </div>
-            </div>
+            ) : (
+              /* HYPER-REALISTIC MACBOOK PRO 3D HARDWARE SHOWCASE DISPLAY (DESKTOP MODE) */
+              <div
+                style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: '920px',
+                  height: '100%',
+                  maxHeight: 'calc(100vh - 110px)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                {/* MacBook Pro Display Lid Frame */}
+                <div
+                  style={{
+                    width: '100%',
+                    flex: 1,
+                    backgroundColor: '#000000',
+                    background: 'linear-gradient(180deg, #2b332d 0%, #161c18 100%)',
+                    border: '14px solid #1e2420',
+                    borderRadius: '24px 24px 4px 4px',
+                    boxShadow: '0 35px 90px rgba(0, 0, 0, 0.95), inset 0 0 0 1.5px rgba(255, 255, 255, 0.2)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  {/* Top Camera Notch */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: '56px',
+                      height: '15px',
+                      backgroundColor: '#000000',
+                      borderRadius: '0 0 8px 8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px',
+                      zIndex: 35
+                    }}
+                  >
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#0b100d', border: '1px solid #1a221d' }} />
+                    <div style={{ width: '3px', height: '3px', borderRadius: '50%', backgroundColor: '#30D158', boxShadow: '0 0 4px #30D158' }} />
+                  </div>
+
+                  {/* Glass Reflection Glare Highlight */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 35%, rgba(255,255,255,0) 60%)',
+                      pointerEvents: 'none',
+                      zIndex: 25
+                    }}
+                  />
+
+                  {/* PURE CLEAN MACBOOK DISPLAY SCREEN CANVAS */}
+                  <div style={{ flex: 1, backgroundColor: '#000000' }} />
+
+                  {/* Bottom Screen Bezel */}
+                  <div
+                    style={{
+                      height: '24px',
+                      backgroundColor: '#090d0a',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      borderTop: '1px solid rgba(255,255,255,0.05)',
+                      zIndex: 30
+                    }}
+                  >
+                    <span style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.35)', letterSpacing: '0.6px' }}>
+                      MacBook Pro
+                    </span>
+                  </div>
+                </div>
+
+                {/* Lower Base Deck Lip */}
+                <div
+                  style={{
+                    width: '106%',
+                    height: '18px',
+                    background: 'linear-gradient(180deg, #242c26 0%, #121714 60%, #0a0d0b 100%)',
+                    borderRadius: '2px 2px 14px 14px',
+                    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.3)',
+                    position: 'relative',
+                    marginTop: '-2px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    justifyContent: 'center'
+                  }}
+                >
+                  <div style={{ width: '64px', height: '6px', backgroundColor: '#0c100d', borderRadius: '0 0 6px 6px', border: '0.5px solid rgba(255,255,255,0.1)', borderTop: 'none' }} />
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
