@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     open: true,
     watch: {
-      ignored: ['**/Agent Company/**']
+      ignored: ['**/Agent Company/**', '**/clone_of_the_website_shown_in_the_image_otmtyq/**']
     }
   }
 });
