@@ -8,7 +8,7 @@ export const CodeStudioView = ({ initialQuery }) => {
     { 
       id: 2, 
       sender: 'ai', 
-      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Code panel active.` 
+      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Phone preview active.` 
     }
   ]);
   const [deviceMode, setDeviceMode] = useState('mobile'); // Default to Mobile Phone Size
@@ -176,7 +176,7 @@ export const CodeStudioView = ({ initialQuery }) => {
       <div
         style={{
           flex: isPaneVisible ? (panelTabMode === 'code' ? 1 : (isMobileMode ? 'none' : 1)) : 0,
-          width: isPaneVisible ? (panelTabMode === 'code' ? 'auto' : (isMobileMode ? '380px' : 'auto')) : '0px',
+          width: isPaneVisible ? (panelTabMode === 'code' ? 'auto' : (isMobileMode ? '390px' : 'auto')) : '0px',
           height: '100vh',
           backgroundColor: 'rgba(4, 6, 5, 0.85)',
           backdropFilter: 'blur(12px)',
@@ -308,7 +308,7 @@ export const CodeStudioView = ({ initialQuery }) => {
               backgroundColor: '#070908'
             }}
           >
-            {/* File Explorer Tree Sidebar (Clean Empty Layout Structure) */}
+            {/* File Explorer Tree Sidebar */}
             <div
               style={{
                 width: '180px',
@@ -362,81 +362,189 @@ export const CodeStudioView = ({ initialQuery }) => {
             </div>
           </div>
         ) : (
-          /* PREVIEW DISPLAY MODE */
+          /* REALISTIC SMARTPHONE HARDWARE PREVIEW DISPLAY MODE */
           <div
             style={{
               flex: 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: isMobileMode ? '16px 12px' : '32px',
-              backgroundColor: 'rgba(0, 0, 0, 0.88)',
+              padding: isMobileMode ? '14px 10px' : '32px',
+              backgroundColor: 'rgba(0, 0, 0, 0.92)',
               position: 'relative',
               overflow: 'hidden'
             }}
           >
-            {/* Phone / Desktop Frame */}
+            {/* Phone Outer Chassis with Physical Side Hardware Buttons */}
             <div
               style={{
-                width: '100%',
-                height: '100%',
-                maxHeight: isMobileMode ? '680px' : '100%',
-                backgroundColor: '#040504',
-                border: isMobileMode ? '8px solid #181c19' : '1px solid rgba(255, 255, 255, 0.08)',
-                borderRadius: isMobileMode ? '36px' : '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '16px',
-                boxShadow: isMobileMode ? '0 30px 80px rgba(0, 0, 0, 0.95)' : '0 30px 80px rgba(0, 0, 0, 0.8)',
                 position: 'relative',
-                overflow: 'hidden',
+                width: isMobileMode ? '340px' : '100%',
+                height: isMobileMode ? '680px' : '100%',
+                maxHeight: isMobileMode ? '680px' : '100%',
                 transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             >
-              {/* Phone Speaker Notch */}
+              {/* Left Side Hardware Buttons (Volume Keys) */}
               {isMobileMode && (
-                <div 
-                  style={{
-                    position: 'absolute',
-                    top: '10px',
-                    width: '100px',
-                    height: '16px',
-                    backgroundColor: '#000000',
-                    borderRadius: '12px',
-                    zIndex: 20,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }}
-                >
-                  <div style={{ width: '32px', height: '3.5px', backgroundColor: '#222222', borderRadius: '2px' }} />
-                </div>
+                <>
+                  <div style={{ position: 'absolute', left: '-15px', top: '110px', width: '4px', height: '42px', backgroundColor: '#2a322c', borderRadius: '3px 0 0 3px', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }} />
+                  <div style={{ position: 'absolute', left: '-15px', top: '165px', width: '4px', height: '42px', backgroundColor: '#2a322c', borderRadius: '3px 0 0 3px', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }} />
+                </>
               )}
 
+              {/* Right Side Hardware Button (Power Lock Key) */}
+              {isMobileMode && (
+                <div style={{ position: 'absolute', right: '-15px', top: '130px', width: '4px', height: '58px', backgroundColor: '#2a322c', borderRadius: '0 3px 3px 0', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.2)' }} />
+              )}
+
+              {/* Main Phone Glass Screen Container */}
               <div
                 style={{
-                  width: '52px',
-                  height: '52px',
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255, 255, 255, 0.04)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: '#020302', // True OLED Black screen
+                  border: isMobileMode ? '11px solid #1d221f' : '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: isMobileMode ? '48px' : '16px',
+                  boxShadow: isMobileMode 
+                    ? '0 25px 70px rgba(0, 0, 0, 0.95), inset 0 0 0 1px rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(0,0,0,0.8)' 
+                    : '0 30px 80px rgba(0, 0, 0, 0.8)',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#30D158'
+                  flexDirection: 'column',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  boxSizing: 'border-box'
                 }}
               >
-                <CodeIcon className="w-5 h-5" />
-              </div>
-              <div style={{ textAlign: 'center', padding: '0 16px' }}>
-                <div style={{ fontSize: '15px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.85)', marginBottom: '4px' }}>
-                  {isMobileMode ? 'Phone Frame Active' : 'Desktop View Active'}
+                {/* Top Status Bar (Clock, Camera Notch, WiFi, Battery) */}
+                {isMobileMode && (
+                  <div
+                    style={{
+                      height: '44px',
+                      width: '100%',
+                      padding: '0 20px',
+                      boxSizing: 'border-box',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      zIndex: 30,
+                      fontSize: '11px',
+                      fontWeight: 600,
+                      color: '#ffffff',
+                      userSelect: 'none'
+                    }}
+                  >
+                    {/* Left: Clock */}
+                    <span style={{ fontFamily: 'sans-serif', letterSpacing: '-0.2px', marginTop: '6px' }}>9:41</span>
+
+                    {/* Center: Dynamic Island Camera Notch */}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '10px',
+                        transform: 'translateX(-50%)',
+                        width: '96px',
+                        height: '24px',
+                        backgroundColor: '#000000',
+                        borderRadius: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '0 10px',
+                        boxShadow: '0 0 4px rgba(0,0,0,0.8)'
+                      }}
+                    >
+                      {/* Camera Lens dot */}
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#090d10', border: '1px solid #1a221d' }} />
+                      {/* Speaker mesh dot */}
+                      <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: '#090d10' }} />
+                    </div>
+
+                    {/* Right: 5G Signal, WiFi, Battery Icons */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                      <span style={{ fontSize: '10px' }}>5G</span>
+                      <div style={{ display: 'flex', gap: '1.5px', alignItems: 'flex-end', height: '10px' }}>
+                        <div style={{ width: '2px', height: '4px', backgroundColor: '#fff' }} />
+                        <div style={{ width: '2px', height: '6px', backgroundColor: '#fff' }} />
+                        <div style={{ width: '2px', height: '8px', backgroundColor: '#fff' }} />
+                        <div style={{ width: '2px', height: '10px', backgroundColor: '#fff' }} />
+                      </div>
+                      <div style={{ width: '18px', height: '9px', border: '1px solid #fff', borderRadius: '3px', padding: '1px', display: 'flex' }}>
+                        <div style={{ flex: 1, backgroundColor: '#30D158', borderRadius: '1px' }} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Phone Screen Display Content Canvas */}
+                <div
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: isMobileMode ? '54px 20px 30px 20px' : '24px',
+                    boxSizing: 'border-box',
+                    gap: '16px',
+                    textAlign: 'center'
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '56px',
+                      height: '56px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#30D158',
+                      boxShadow: '0 10px 24px rgba(0,0,0,0.5)'
+                    }}
+                  >
+                    <CodeIcon className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '15px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.9)', marginBottom: '6px' }}>
+                      {isMobileMode ? 'Smartphone Display Active' : 'Desktop View Active'}
+                    </div>
+                    <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.4)', maxWidth: '240px', lineHeight: '1.4' }}>
+                      True OLED Black Screen — Live code execution display ready.
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.4)', maxWidth: '240px' }}>
-                  Display Screen Black — Ready for code output execution.
-                </div>
+
+                {/* Bottom iOS Swipe Home Bar */}
+                {isMobileMode && (
+                  <div
+                    style={{
+                      height: '20px',
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      position: 'absolute',
+                      bottom: '4px',
+                      left: 0,
+                      zIndex: 30
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: '115px',
+                        height: '4px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.85)',
+                        borderRadius: '2px'
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>
