@@ -721,6 +721,21 @@ Generate a detailed, step-by-step Custom AI Web Developer System Prompt formatte
 3. 🧩 Key Pages & Components (Hero, Services/Catalog, Google Maps Location, WhatsApp Booking, Contact Form)
 4. 💻 Full HTML/CSS/JS Technical Architecture & Responsive Breakpoints
 5. 🚀 Complete Execution Instructions to build the site with zero placeholders!`;
+    } else if (text.trim().toLowerCase().startsWith('/ide')) {
+        switchToIde();
+        return;
+    } else if (text.trim().toLowerCase().startsWith('/clone-image')) {
+        switchToIde();
+        setTimeout(() => ideImageFile?.click(), 100);
+        return;
+    } else if (text.trim().toLowerCase().startsWith('/build')) {
+        const buildQuery = text.trim().replace(/^\/build/i, '').trim() || 'Modern responsive web application';
+        promptToDisplay = text;
+        promptForAI = `AI POWER IDE WEBSITE BUILDER DIRECTIVE:
+The user wants to build a website project in AI POWER IDE workspace.
+Prompt Query: "${buildQuery}"
+
+Generate a complete, single-file production-ready HTML/CSS/JS website code matching the specification!`;
     } else if (text.trim().toLowerCase().startsWith('/download') || (text.toLowerCase().includes('download') && text.toLowerCase().includes('website'))) {
         const targetUrl = text.trim().replace(/^\/download/i, '').trim() || 'https://example.com';
         promptToDisplay = text;
@@ -2065,3 +2080,126 @@ window.exportLeadsPDF = function(btn) {
         btn.textContent = '📄 Download PDF';
     }
 };
+
+// ── AI POWER IDE WORKSPACE CONTROLLER ────────────────────────────────────
+const ideView = getEl('ide-view');
+const navAiIde = getEl('nav-ai-ide');
+
+function switchToIde() {
+    activeView = 'ide';
+    homeView?.classList.remove('active');
+    chatView?.classList.remove('active');
+    ideView?.classList.add('active');
+    setRailActive(navAiIde);
+    historyPanel?.classList.remove('active');
+    mainLayout?.classList.remove('history-open');
+}
+
+navAiIde?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    switchToIde();
+});
+
+const ideImageDropzone = getEl('ide-image-dropzone');
+const ideImageFile = getEl('ide-image-file');
+const dropzoneContent = getEl('dropzone-content');
+const dropzonePreview = getEl('dropzone-preview');
+const idePreviewImg = getEl('ide-preview-img');
+const ideRemoveImg = getEl('ide-remove-img');
+const idePromptInput = getEl('ide-prompt-input');
+const btnIdeGenerate = getEl('btn-ide-generate');
+const btnIdeCloneImage = getEl('btn-ide-clone-image');
+const btnIdePreview = getEl('btn-ide-preview');
+const btnIdeCode = getEl('btn-ide-code');
+const btnIdeOpenTab = getEl('btn-ide-open-tab');
+const ideIframe = getEl('ide-iframe');
+const ideCanvasWrap = getEl('ide-canvas-wrap');
+const ideCodeWrap = getEl('ide-code-wrap');
+const ideCodeContent = getEl('ide-code-content');
+const ideCanvasTitle = getEl('ide-canvas-title');
+
+let ideBase64Image = null;
+let currentIdeProjectUrl = 'about:blank';
+let isIdeCodeView = false;
+
+// Dropzone Upload
+ideImageDropzone?.addEventListener('click', (e) => {
+    if (e.target !== ideRemoveImg) {
+        ideImageFile?.click();
+    }
+});
+
+ideImageFile?.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+        ideBase64Image = reader.result.split(',')[1];
+        if (idePreviewImg) idePreviewImg.src = reader.result;
+        if (dropzoneContent) dropzoneContent.style.display = 'none';
+        if (dropzonePreview) dropzonePreview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+});
+
+ideRemoveImg?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    ideBase64Image = null;
+    if (ideImageFile) ideImageFile.value = '';
+    if (dropzonePreview) dropzonePreview.style.display = 'none';
+    if (dropzoneContent) dropzoneContent.style.display = 'flex';
+});
+
+btnIdeCloneImage?.addEventListener('click', () => {
+    switchToIde();
+    ideImageFile?.click();
+});
+
+btnIdePreview?.addEventListener('click', () => {
+    isIdeCodeView = false;
+    if (ideCanvasWrap) ideCanvasWrap.style.display = 'block';
+    if (ideCodeWrap) ideCodeWrap.style.display = 'none';
+    if (ideCanvasTitle) ideCanvasTitle.textContent = '🌐 Live Canvas Preview';
+});
+
+btnIdeCode?.addEventListener('click', () => {
+    isIdeCodeView = !isIdeCodeView;
+    if (isIdeCodeView) {
+        if (ideCanvasWrap) ideCanvasWrap.style.display = 'none';
+        if (ideCodeWrap) ideCodeWrap.style.display = 'block';
+        if (ideCanvasTitle) ideCanvasTitle.textContent = '💻 Source Code Inspector';
+    } else {
+        if (ideCanvasWrap) ideCanvasWrap.style.display = 'block';
+        if (ideCodeWrap) ideCodeWrap.style.display = 'none';
+        if (ideCanvasTitle) ideCanvasTitle.textContent = '🌐 Live Canvas Preview';
+    }
+});
+
+btnIdeOpenTab?.addEventListener('click', () => {
+    if (currentIdeProjectUrl && currentIdeProjectUrl !== 'about:blank') {
+        window.open(currentIdeProjectUrl, '_blank');
+    }
+});
+
+// AI IDE Generate / Clone Handler
+btnIdeGenerate?.addEventListener('click', async () => {
+    const promptText = idePromptInput?.value.trim() || 'Build a modern responsive landing page website';
+    if (btnIdeGenerate) btnIdeGenerate.innerHTML = '<span>⏳ Building & Cloning Project...</span>';
+    
+    const buildPrompt = ideBase64Image 
+        ? `VISION MULTIMODAL WEBSITE CLONING DIRECTIVE:
+The user uploaded a website or UI screenshot to clone in AI POWER IDE.
+Prompt Instructions: "${promptText}"
+
+Analyze the layout, hero section, typography, components, and design system of the screenshot.
+Generate a complete single-file HTML/CSS/JS website code matching the screenshot!`
+        : `AI POWER IDE WEBSITE BUILDER DIRECTIVE:
+Build a complete responsive website project for: "${promptText}"
+
+Generate production-ready single-file HTML/CSS/JS web application with zero placeholders!`;
+
+    switchToChat();
+    sendMessage(buildPrompt);
+    
+    if (btnIdeGenerate) btnIdeGenerate.innerHTML = '<span>🚀 Build & Clone Project</span>';
+});

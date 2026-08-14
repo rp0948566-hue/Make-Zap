@@ -35,6 +35,9 @@
         <a class="rail-item" id="nav-clone-folder" href="javascript:void(0)" title="Clone Website Project (clone_of_the_website_shown_in_the_image_otmtyq)">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
         </a>
+        <a class="rail-item" id="nav-ai-ide" href="javascript:void(0)" title="AI POWER IDE (Build & Clone Websites)">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </a>
         <a class="rail-item" id="nav-new-chat-rail" href="javascript:void(0)" title="New Chat">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </a>
@@ -163,6 +166,73 @@
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── AI POWER IDE SEPARATE ENVIRONMENT VIEW ── -->
+    <div id="ide-view" class="view">
+        <header class="ide-header">
+            <div class="ide-header-left">
+                <div class="ide-logo">⚡ AI POWER IDE</div>
+                <span class="ide-badge">Build & Vision Engine</span>
+            </div>
+            <div class="ide-header-actions">
+                <button class="ide-top-btn" id="btn-ide-clone-image" title="Vision Multimodal Image Cloning">
+                    <span>📸 Clone UI from Image</span>
+                </button>
+                <button class="ide-top-btn" id="btn-ide-preview" title="Live Preview Site">
+                    <span>▶️ Run Canvas</span>
+                </button>
+                <button class="ide-top-btn" id="btn-ide-code" title="Toggle Code Inspector">
+                    <span>💻 Code Inspector</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="ide-workspace">
+            <!-- LEFT COLUMN: AI BUILD & VISION PROMPT PANEL -->
+            <div class="ide-panel ide-prompt-panel">
+                <div class="ide-panel-title">
+                    <span>⚡ AI Builder & Vision Inspector</span>
+                </div>
+                <div class="ide-prompt-body">
+                    <div class="ide-image-dropzone" id="ide-image-dropzone">
+                        <input type="file" id="ide-image-file" accept="image/*" style="display:none;">
+                        <div class="dropzone-content" id="dropzone-content">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            <span style="font-weight: 600;">Drag & Drop UI Screenshot or Click to Upload</span>
+                            <span class="dropzone-sub">AI Vision model will analyze layout, components & colors to build website code</span>
+                        </div>
+                        <div class="dropzone-preview" id="dropzone-preview" style="display:none;">
+                            <img id="ide-preview-img" src="" alt="UI Screenshot">
+                            <button id="ide-remove-img" class="ide-img-remove">&times;</button>
+                        </div>
+                    </div>
+
+                    <div class="ide-input-group">
+                        <label>AI Build Directive / Prompt</label>
+                        <textarea id="ide-prompt-input" placeholder="e.g. Build a modern landing page for a coffee shop with hero section, menu grid, and online ordering form..."></textarea>
+                    </div>
+
+                    <button class="ide-build-btn" id="btn-ide-generate">
+                        <span>🚀 Build & Clone Project</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CENTER/RIGHT COLUMN: LIVE PREVIEW & CODE INSPECTOR -->
+            <div class="ide-panel ide-preview-panel">
+                <div class="ide-panel-title">
+                    <span id="ide-canvas-title">🌐 Live Canvas Preview</span>
+                    <button class="ide-small-btn" id="btn-ide-open-tab">Open in New Tab ↗</button>
+                </div>
+                <div class="ide-canvas-wrap" id="ide-canvas-wrap">
+                    <iframe id="ide-iframe" src="about:blank"></iframe>
+                </div>
+                <div class="ide-code-wrap" id="ide-code-wrap" style="display:none;">
+                    <pre id="ide-code-content"><code>// Source code will render here after build...</code></pre>
                 </div>
             </div>
         </div>
@@ -327,6 +397,20 @@
                 <div class="slash-opt-info">
                     <div class="slash-opt-name">/download</div>
                     <div class="slash-opt-desc">Download complete website HTML/CSS/JS with Complete-Website-Downloader</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/ide">
+                <span class="slash-icon">⚡</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/ide</div>
+                    <div class="slash-opt-desc">Open dedicated AI POWER IDE build workspace</div>
+                </div>
+            </div>
+            <div class="slash-opt-item" data-cmd="/clone-image">
+                <span class="slash-icon">📸</span>
+                <div class="slash-opt-info">
+                    <div class="slash-opt-name">/clone-image</div>
+                    <div class="slash-opt-desc">Vision Multimodal: Clone website from UI screenshot / image</div>
                 </div>
             </div>
             <div class="slash-opt-item" data-cmd="/researcher">

@@ -4,7 +4,7 @@
   "title": "Certainly! Here's a structured table of potential",
   "model": "agent",
   "createdAt": "2026-08-13T20:56:36.862Z",
-  "updatedAt": "2026-08-13T20:59:19.397Z",
+  "updatedAt": "2026-08-13T21:12:49.538Z",
   "isPinned": false,
   "folderId": null,
   "messages": [
@@ -85,6 +85,23 @@
       "model": "agent",
       "interrupted": false,
       "id": 31
+    },
+    {
+      "sessionId": "sess_1786654596862_ejpp4",
+      "role": "user",
+      "content": "/reach find businesses without website in Indore main indore one i wnat all data how do not ahve website now and good rating like cae and all cloth shop and all\\\n NOT TOO SMALL BIGN NAD NOT TOO BIG ALSO WIHC GOGLE RATING IS GOOD",
+      "timestamp": "2026-08-13T21:12:49.535Z",
+      "model": "agent",
+      "id": 32
+    },
+    {
+      "sessionId": "sess_1786654596862_ejpp4",
+      "role": "assistant",
+      "content": "Sure, let's execute the `lead_finder.py` script first:\n\n```action\n{\n  \"type\": \"shell\",\n  \"params\": {\n    \"command\": \"python lead_finder.py \\\"find businesses without website in Indore main indore one i wnat all data how do not ahve website now and good rating like cae and all cloth shop and all\\\n NOT TOO SMALL BIGN NAD NOT TOO BIG ALSO WIHC GOGLE RATING IS GOOD\\\"\"\n  }\n}\n```\n\nOnce the script completes, I will present the Lead Opportunities Table with the details requested.",
+      "timestamp": "2026-08-13T21:12:49.535Z",
+      "model": "agent",
+      "interrupted": false,
+      "id": 33
     }
   ]
 }
