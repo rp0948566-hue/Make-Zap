@@ -11,12 +11,14 @@ export const CodeStudioView = ({ initialQuery }) => {
     { 
       id: 2, 
       sender: 'ai', 
-      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Display active.` 
+      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Workspace active.` 
     }
   ]);
   const [deviceMode, setDeviceMode] = useState('mobile'); // 'mobile' | 'desktop'
-  const [panelTabMode, setPanelTabMode] = useState('preview'); // 'preview' | 'code'
+  const [panelTabMode, setPanelTabMode] = useState('code'); // Default to 'code' for /code mode
   const [isPaneVisible, setIsPaneVisible] = useState(true);
+  const [selectedFile, setSelectedFile] = useState('SearchInputBox.jsx');
+  const [isFolderOpen, setIsFolderOpen] = useState(true);
 
   // Sync session to Supabase
   useEffect(() => {
@@ -31,12 +33,120 @@ export const CodeStudioView = ({ initialQuery }) => {
     const aiMsg = {
       id: Date.now() + 1,
       sender: 'ai',
-      text: `Updated code configuration for "${queryText}". Display updated.`
+      text: `Updated code configuration for "${queryText}". Workspace code updated.`
     };
     setMessages((prev) => [...prev, userMsg, aiMsg]);
   };
 
   const isMobileMode = deviceMode === 'mobile';
+
+  const designFiles = [
+    { name: 'SearchInputBox.jsx', type: 'jsx' },
+    { name: 'ChatView.jsx', type: 'jsx' },
+    { name: 'CodeStudioView.jsx', type: 'jsx' },
+    { name: 'LeftGlassPanel.jsx', type: 'jsx' },
+    { name: 'LoginModal.jsx', type: 'jsx' },
+    { name: 'NavigationBar.jsx', type: 'jsx' },
+    { name: 'VideoBackground.jsx', type: 'jsx' }
+  ];
+
+  const codeSnippets = {
+    'SearchInputBox.jsx': `import React, { useState, useRef } from 'react';
+import { AISparkleIcon, UpArrowIcon, PaperclipIcon, SearchIcon, CodeIcon } from './Icons';
+
+export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) => {
+  const [text, setText] = useState('');
+  const textareaRef = useRef(null);
+
+  const handleSend = () => {
+    if (!text.trim()) return;
+    if (onSubmit) onSubmit(text);
+    setText('');
+  };
+
+  return (
+    <div style={{ maxWidth: '728px', width: '100%', borderRadius: '22px' }}>
+      <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '18px' }}>
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder={placeholder}
+        />
+        <button onClick={handleSend}><UpArrowIcon /></button>
+      </div>
+    </div>
+  );
+};`,
+    'ChatView.jsx': `import React, { useState } from 'react';
+import { SearchInputBox } from './SearchInputBox';
+
+export const ChatView = ({ initialQuery }) => {
+  const [messages, setMessages] = useState([
+    { id: 1, sender: 'user', text: initialQuery }
+  ]);
+
+  return (
+    <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+      {messages.map((msg) => (
+        <div key={msg.id} style={{ color: '#fff' }}>{msg.text}</div>
+      ))}
+      <SearchInputBox placeholder="Ask follow-up..." />
+    </div>
+  );
+};`,
+    'CodeStudioView.jsx': `import React, { useState } from 'react';
+import { SearchInputBox } from './SearchInputBox';
+
+export const CodeStudioView = ({ initialQuery }) => {
+  const [selectedFile, setSelectedFile] = useState('SearchInputBox.jsx');
+
+  return (
+    <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
+      {/* Split-screen Code Studio & Phone/Desktop Workspace */}
+    </div>
+  );
+};`,
+    'LeftGlassPanel.jsx': `import React from 'react';
+import { PlusIcon, HistoryIcon, DownloadIcon } from './Icons';
+
+export const LeftGlassPanel = ({ onNewChat }) => {
+  return (
+    <aside style={{ width: '64px', height: '100vh', position: 'fixed' }}>
+      {/* 64px Dark Glass Navigation Rail */}
+    </aside>
+  );
+};`,
+    'LoginModal.jsx': `import React from 'react';
+import { useAuth } from '../AuthContext';
+
+export const LoginModal = ({ onClose }) => {
+  const { signInWithGoogle } = useAuth();
+  return (
+    <div style={{ position: 'fixed', inset: 0 }}>
+      {/* Google OAuth & Email Authentication Modal */}
+    </div>
+  );
+};`,
+    'NavigationBar.jsx': `import React from 'react';
+
+export const NavigationBar = ({ onLoginClick }) => {
+  return (
+    <nav style={{ padding: '16px 120px', width: '100%' }}>
+      <div style={{ fontSize: '34px', fontWeight: 700 }}>Mark Zap</div>
+    </nav>
+  );
+};`,
+    'VideoBackground.jsx': `import React from 'react';
+
+export const VideoBackground = () => {
+  return (
+    <video autoPlay loop muted playsInline style={{ position: 'fixed', inset: 0 }}>
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/..." type="video/mp4" />
+    </video>
+  );
+};`
+  };
 
   return (
     <div
@@ -111,7 +221,7 @@ export const CodeStudioView = ({ initialQuery }) => {
                 transition: 'transform 0.15s ease'
               }}
             >
-              <span>Show Preview Pane 👁️</span>
+              <span>Show Workspace Pane 👁️</span>
             </button>
           )}
         </div>
@@ -182,7 +292,7 @@ export const CodeStudioView = ({ initialQuery }) => {
         </div>
       </div>
 
-      {/* Right Column: Increased Phone Panel Width */}
+      {/* Right Column: Code Studio & Phone/Desktop Workspace */}
       <div
         style={{
           flex: isPaneVisible ? (panelTabMode === 'code' ? 1 : (isMobileMode ? 'none' : 1)) : 0,
@@ -216,22 +326,6 @@ export const CodeStudioView = ({ initialQuery }) => {
           {/* Main Tab Switchers */}
           <div style={{ display: 'flex', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '2px', gap: '2px' }}>
             <button
-              onClick={() => setPanelTabMode('preview')}
-              style={{
-                backgroundColor: panelTabMode === 'preview' ? '#ffffff' : 'transparent',
-                color: panelTabMode === 'preview' ? '#000000' : 'rgba(255, 255, 255, 0.7)',
-                border: 'none',
-                borderRadius: '6px',
-                padding: '4px 12px',
-                fontSize: '12.5px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
-              }}
-            >
-              👁️ Preview
-            </button>
-            <button
               onClick={() => setPanelTabMode('code')}
               style={{
                 backgroundColor: panelTabMode === 'code' ? '#ffffff' : 'transparent',
@@ -245,7 +339,23 @@ export const CodeStudioView = ({ initialQuery }) => {
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             >
-              💻 Code
+              💻 Code Workspace
+            </button>
+            <button
+              onClick={() => setPanelTabMode('preview')}
+              style={{
+                backgroundColor: panelTabMode === 'preview' ? '#ffffff' : 'transparent',
+                color: panelTabMode === 'preview' ? '#000000' : 'rgba(255, 255, 255, 0.7)',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '4px 12px',
+                fontSize: '12.5px',
+                fontWeight: 600,
+                cursor: 'pointer',
+                transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+              }}
+            >
+              👁️ Device Showcase
             </button>
           </div>
 
@@ -308,9 +418,8 @@ export const CodeStudioView = ({ initialQuery }) => {
           </div>
         </div>
 
-        {/* Panel Main Area */}
+        {/* Panel Main Area: Code View with 📁 Design Folder Tree */}
         {panelTabMode === 'code' ? (
-          /* CODE VIEW */
           <div
             style={{
               flex: 1,
@@ -320,9 +429,10 @@ export const CodeStudioView = ({ initialQuery }) => {
               backgroundColor: '#070908'
             }}
           >
+            {/* Explorer Sidebar Tree with 📁 Design Folder */}
             <div
               style={{
-                width: '180px',
+                width: '220px',
                 backgroundColor: 'rgba(12, 16, 14, 0.95)',
                 borderRight: '1px solid rgba(255, 255, 255, 0.08)',
                 padding: '16px 12px',
@@ -331,48 +441,131 @@ export const CodeStudioView = ({ initialQuery }) => {
                 flexDirection: 'column',
                 gap: '12px',
                 fontFamily: "'SFMono-Regular', Consolas, monospace",
-                fontSize: '12.5px'
+                fontSize: '12.5px',
+                userSelect: 'none'
               }}
             >
-              <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.4)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
                 EXPLORER
+              </div>
+
+              {/* 📁 Design Folder Item */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div
+                  onClick={() => setIsFolderOpen(!isFolderOpen)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: '#30D158',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    padding: '4px 6px',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(48, 209, 88, 0.1)'
+                  }}
+                >
+                  <span style={{ fontSize: '11px', transition: 'transform 0.15s ease', transform: isFolderOpen ? 'rotate(90deg)' : 'none' }}>▶</span>
+                  <span>📁 Design</span>
+                </div>
+
+                {/* Sub-files inside 📁 Design */}
+                {isFolderOpen && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '16px', marginTop: '2px' }}>
+                    {designFiles.map((f, idx) => {
+                      const isSelected = selectedFile === f.name;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setSelectedFile(f.name)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '6px 8px',
+                            borderRadius: '6px',
+                            backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
+                            color: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                            cursor: 'pointer',
+                            fontWeight: isSelected ? 600 : 400,
+                            fontSize: '12px',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <span style={{ fontSize: '13px', color: '#0A84FF' }}>📄</span>
+                          <span>{f.name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
+            {/* Code Workspace Editor Area */}
             <div
               style={{
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'column',
                 backgroundColor: '#040504',
-                padding: '24px',
-                boxSizing: 'border-box'
+                padding: '20px 24px',
+                boxSizing: 'border-box',
+                overflow: 'hidden'
               }}
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingBottom: '12px', borderBottom: '1px solid rgba(255, 255, 255, 0.06)' }}>
-                <span style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.45)', fontFamily: 'monospace' }}>
-                  Code Workspace — Empty Structure
-                </span>
+              {/* Editor Header Bar */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '12px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '13px', color: '#0A84FF' }}>📄</span>
+                  <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#ffffff', fontFamily: 'monospace' }}>
+                    {selectedFile}
+                  </span>
+                  <span style={{ fontSize: '10.5px', color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.15)', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
+                    JavaScript React
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => navigator.clipboard.writeText(codeSnippets[selectedFile] || '')}
+                  style={{
+                    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '11.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Copy Code
+                </button>
               </div>
+
+              {/* Code Canvas Content Area */}
               <div
                 style={{
                   flex: 1,
                   marginTop: '16px',
-                  border: '1px dashed rgba(255, 255, 255, 0.08)',
+                  backgroundColor: '#070907',
+                  border: '1px solid rgba(255, 255, 255, 0.08)',
                   borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: 'rgba(255, 255, 255, 0.25)',
-                  fontSize: '13.5px'
+                  padding: '20px',
+                  overflowY: 'auto',
+                  fontFamily: "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace",
+                  fontSize: '13px',
+                  lineHeight: '1.6',
+                  color: '#d4d4d4',
+                  whiteSpace: 'pre-wrap'
                 }}
               >
-                Clean Empty Workspace Area
+                {codeSnippets[selectedFile] || '// Code content loading...'}
               </div>
             </div>
           </div>
         ) : (
-          /* PREVIEW MODE */
+          /* PREVIEW SHOWCASE MODE */
           <div
             style={{
               flex: 1,
@@ -419,16 +612,6 @@ export const CodeStudioView = ({ initialQuery }) => {
                     boxSizing: 'border-box'
                   }}
                 >
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 40%, rgba(255,255,255,0) 65%)',
-                      pointerEvents: 'none',
-                      zIndex: 25
-                    }}
-                  />
-
                   <div
                     style={{
                       position: 'absolute',
