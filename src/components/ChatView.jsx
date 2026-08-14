@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { SearchInputBox } from './SearchInputBox';
 import { useAuth } from '../AuthContext';
 import { saveChatToSupabase } from '../chatService';
+import { generateMarkZapAIResponse } from '../aiEngine';
 
 export const ChatView = ({ initialQuery }) => {
   const { user } = useAuth();
+  
+  const initialAIResponse = generateMarkZapAIResponse(initialQuery || '');
+
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -14,9 +18,8 @@ export const ChatView = ({ initialQuery }) => {
     {
       id: 2,
       sender: 'ai',
-      text: initialQuery 
-        ? `Here are your insights for "${initialQuery}". All data streams have been processed in real time.`
-        : ''
+      text: initialQuery ? initialAIResponse.text : '',
+      leads: initialAIResponse.leads
     }
   ]);
 
@@ -29,11 +32,15 @@ export const ChatView = ({ initialQuery }) => {
 
   const handleSendFollowUp = (queryText) => {
     if (!queryText.trim()) return;
+    
+    const aiResponse = generateMarkZapAIResponse(queryText);
+
     const userMsg = { id: Date.now(), sender: 'user', text: queryText };
     const aiMsg = {
       id: Date.now() + 1,
       sender: 'ai',
-      text: `Processing "${queryText}". Live results updated across your active workspace.`
+      text: aiResponse.text,
+      leads: aiResponse.leads
     };
     setMessages((prev) => [...prev, userMsg, aiMsg]);
   };
@@ -111,7 +118,7 @@ export const ChatView = ({ initialQuery }) => {
             );
           }
 
-          /* AI Response: Clean Text Only */
+          /* AI Response: Dynamic Mark Zap AI Intelligence Output */
           return (
             <div 
               key={msg.id}
@@ -133,10 +140,10 @@ export const ChatView = ({ initialQuery }) => {
                   paddingLeft: '4px'
                 }}
               >
-                Mark Zap AI
+                Mark Zap AI Engine
               </div>
 
-              {/* AI Response Text ONLY */}
+              {/* AI Response Text */}
               <div 
                 style={{
                   maxWidth: '90%',
@@ -144,10 +151,11 @@ export const ChatView = ({ initialQuery }) => {
                   fontSize: '16px',
                   lineHeight: '1.6',
                   fontWeight: 400,
-                  paddingLeft: '4px'
+                  paddingLeft: '4px',
+                  whiteSpace: 'pre-wrap'
                 }}
               >
-                <p style={{ margin: 0 }}>{msg.text}</p>
+                {msg.text}
               </div>
             </div>
           );
