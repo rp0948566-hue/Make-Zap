@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Mark Zap Agent-Reach — 60 Major Prospect Leads Showcase</title>
+  <title>Mark Zap Agent-Reach — 60 Major Prospect Leads Intelligence Hub</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
-      --bg-dark: #060807;
-      --card-bg: rgba(14, 18, 16, 0.95);
+      --bg-dark: #040605;
+      --surface-dark: #0c100e;
+      --card-bg: rgba(14, 18, 16, 0.94);
       --card-border: rgba(255, 255, 255, 0.12);
       --accent-green: #30D158;
+      --accent-green-glow: rgba(48, 209, 88, 0.25);
       --accent-blue: #0A84FF;
       --accent-red: #ff453a;
       --text-main: #ffffff;
@@ -31,57 +33,87 @@
       color: var(--text-main);
       font-family: 'Schibsted Grotesk', 'Inter', sans-serif;
       min-height: 100vh;
-      padding-bottom: 80px;
+      padding-bottom: 100px;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Top Navigation Header */
+    /* Ambient Background Glow */
+    .glow-bg {
+      position: fixed;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(48, 209, 88, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Top Sticky Header */
     header {
       position: sticky;
       top: 0;
-      zIndex: 50;
-      background-color: rgba(6, 8, 7, 0.88);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      z-index: 100;
+      background-color: rgba(4, 6, 5, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 20px 40px;
+      padding: 16px 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
 
-    .logo-container {
+    .logo-group {
       display: flex;
       align-items: center;
       gap: 12px;
     }
 
-    .logo-badge {
-      background-color: var(--accent-green);
+    .brand-badge {
+      background: linear-gradient(135deg, #30D158 0%, #1e8e3e 100%);
       color: #000000;
       font-weight: 800;
-      font-size: 14px;
-      padding: 4px 10px;
+      font-size: 13px;
+      padding: 5px 12px;
       border-radius: 8px;
+      letter-spacing: 0.5px;
+      box-shadow: 0 0 16px rgba(48, 209, 88, 0.3);
     }
 
-    .logo-title {
-      font-size: 20px;
+    .brand-title {
+      font-size: 19px;
       font-weight: 800;
       color: #ffffff;
       letter-spacing: -0.5px;
     }
 
-    .header-actions {
+    .status-pill {
+      font-size: 12px;
+      fontWeight: 600;
+      color: #30D158;
+      background: rgba(48, 209, 88, 0.12);
+      border: 1px solid rgba(48, 209, 88, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: #30D158;
+      box-shadow: 0 0 8px #30D158;
     }
 
     .btn-pdf-download {
-      background-color: var(--accent-green);
+      background: #30D158;
       color: #000000;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 13.5px;
       padding: 10px 20px;
       border-radius: 12px;
@@ -101,30 +133,64 @@
 
     /* Container Main */
     main {
-      max-width: 1280px;
+      position: relative;
+      z-index: 10;
+      max-width: 1320px;
       margin: 0 auto;
       padding: 40px 24px;
     }
 
-    /* Hero Headline */
-    .hero-banner {
+    /* Hero Banner */
+    .hero-section {
       text-align: center;
       margin-bottom: 40px;
     }
 
-    .hero-banner h1 {
-      font-size: 38px;
-      font-weight: 800;
-      letter-spacing: -1px;
-      margin-bottom: 10px;
+    .hero-title {
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: -1.2px;
+      margin-bottom: 12px;
+      background: linear-gradient(180deg, #ffffff 0%, rgba(255, 255, 255, 0.75) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .hero-banner p {
+    .hero-desc {
       color: var(--text-muted);
       font-size: 16px;
-      max-width: 680px;
+      max-width: 720px;
       margin: 0 auto;
-      line-height: 1.5;
+      line-height: 1.55;
+    }
+
+    /* Metric Cards Grid Bar */
+    .metrics-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .metric-card {
+      background: rgba(14, 18, 16, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      backdrop-filter: blur(12px);
+    }
+
+    .metric-val {
+      font-size: 26px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 4px;
+    }
+
+    .metric-label {
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-weight: 500;
     }
 
     /* Filter Controls Bar */
@@ -135,10 +201,11 @@
       flex-wrap: wrap;
       gap: 16px;
       margin-bottom: 30px;
-      background: rgba(14, 18, 16, 0.8);
+      background: rgba(12, 16, 14, 0.9);
       border: 1px solid var(--card-border);
       padding: 14px 20px;
       border-radius: 18px;
+      backdrop-filter: blur(16px);
     }
 
     .filter-pills {
@@ -149,10 +216,10 @@
     }
 
     .filter-pill {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.06);
       color: rgba(255, 255, 255, 0.75);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 10px;
       font-size: 13px;
       font-weight: 600;
@@ -164,17 +231,18 @@
       background: #ffffff;
       color: #000000;
       border-color: #ffffff;
+      font-weight: 700;
     }
 
     .search-input {
-      background: rgba(0, 0, 0, 0.6);
+      background: rgba(0, 0, 0, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.18);
       color: #ffffff;
       padding: 10px 18px;
       border-radius: 12px;
       font-size: 14px;
       outline: none;
-      width: 280px;
+      width: 300px;
       transition: border-color 0.2s ease;
     }
 
@@ -185,40 +253,34 @@
     /* Leads Grid */
     .leads-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(390px, 1fr));
+      gap: 22px;
     }
 
     .lead-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 18px;
-      padding: 22px;
+      border-radius: 20px;
+      padding: 24px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 14px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      gap: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
     }
 
     .lead-card:hover {
-      transform: translateY(-4px);
-      border-color: rgba(48, 209, 88, 0.4);
-    }
-
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 10px;
+      transform: translateY(-6px);
+      border-color: rgba(48, 209, 88, 0.45);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7), 0 0 20px rgba(48, 209, 88, 0.15);
     }
 
     .card-title {
-      font-size: 18px;
+      font-size: 18.5px;
       font-weight: 700;
       color: #ffffff;
-      line-height: 1.3;
+      line-height: 1.35;
     }
 
     .card-location {
@@ -235,16 +297,17 @@
       padding: 4px 10px;
       border-radius: 8px;
       white-space: nowrap;
+      border: 1px solid rgba(255, 69, 58, 0.3);
     }
 
     .card-meta {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      font-size: 13px;
-      background: rgba(255, 255, 255, 0.04);
+      gap: 10px;
+      font-size: 12.5px;
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 12px;
+      padding: 12px 14px;
       border-radius: 12px;
     }
 
@@ -258,10 +321,10 @@
     }
 
     .why-box {
-      background: rgba(48, 209, 88, 0.1);
+      background: rgba(48, 209, 88, 0.08);
       border: 1px solid rgba(48, 209, 88, 0.25);
       border-radius: 12px;
-      padding: 12px;
+      padding: 12px 14px;
       font-size: 12.5px;
       color: #ffffff;
       line-height: 1.45;
@@ -274,14 +337,14 @@
     .card-actions {
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: space-between;
       margin-top: 4px;
     }
 
     .btn-maps {
       background: rgba(10, 132, 255, 0.18);
       color: var(--accent-blue);
-      border: 1px solid rgba(10, 132, 255, 0.3);
+      border: 1px solid rgba(10, 132, 255, 0.35);
       padding: 8px 14px;
       border-radius: 10px;
       font-size: 12.5px;
@@ -297,18 +360,46 @@
       background: rgba(10, 132, 255, 0.3);
     }
 
-    .btn-phone {
-      background: rgba(48, 209, 88, 0.18);
+    .btn-proposal {
+      background: rgba(48, 209, 88, 0.2);
       color: var(--accent-green);
-      border: 1px solid rgba(48, 209, 88, 0.3);
+      border: 1px solid rgba(48, 209, 88, 0.4);
       padding: 8px 14px;
       border-radius: 10px;
       font-size: 12.5px;
-      font-weight: 600;
-      text-decoration: none;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s ease;
     }
 
-    /* Footer */
+    .btn-proposal:hover {
+      background: var(--accent-green);
+      color: #000000;
+    }
+
+    /* Modal Proposal Box */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 660px;
+      background: #0c100e;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 24px;
+      padding: 28px;
+      color: #ffffff;
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.9);
+    }
+
     footer {
       text-align: center;
       color: var(--text-muted);
@@ -321,32 +412,53 @@
 </head>
 <body>
 
+  <div class="glow-bg"></div>
+
   <header>
-    <div class="logo-container">
-      <span class="logo-badge">MARK ZAP</span>
-      <span class="logo-title">60 Major Leads Showcase</span>
+    <div class="logo-group">
+      <span class="brand-badge">MARK ZAP</span>
+      <span class="brand-title">60 Major Leads Showcase</span>
+      <span class="status-pill"><span class="status-dot"></span> 60 Live Streams</span>
     </div>
-    <div class="header-actions">
-      <button class="btn-pdf-download" onclick="downloadAll60PDF()">
-        <span>⬇️ Download All 60 Leads PDF</span>
-      </button>
-    </div>
+    <button class="btn-pdf-download" onclick="downloadAll60PDF()">
+      <span>⬇️ Export All 60 Leads PDF</span>
+    </button>
   </header>
 
   <main>
-    <div class="hero-banner">
-      <h1>60 Major Prospect Companies Without Websites</h1>
-      <p>Target Profile: Established Mid-Range Businesses ($600K–$2.5M / ₹40L–₹3.5Cr Annual Revenue) with High Intent to Build a Website.</p>
+    <section class="hero-section">
+      <h1 class="hero-title">Agent-Reach Executive Lead Intelligence</h1>
+      <p class="hero-desc">60 Verified Mid-Range Prospect Companies ($600K–$2.5M / ₹40L–₹3.5Cr Annual Revenue) WITHOUT Websites, Complete with Google Maps Links, Phone Numbers & Pitch Conversion Strategies.</p>
+    </section>
+
+    <!-- Metrics Bar -->
+    <div class="metrics-bar">
+      <div class="metric-card">
+        <div class="metric-val" style="color: #30D158;">60</div>
+        <div class="metric-label">📊 Qualified Prospects</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" style="color: #0A84FF;">30</div>
+        <div class="metric-label">📍 Indore Priority Leads</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" style="color: #FF9F0A;">₹88 Cr</div>
+        <div class="metric-label">💰 Est. Pipeline Value</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-val" style="color: #ff453a;">100%</div>
+        <div class="metric-label">❌ Without Website Gap</div>
+      </div>
     </div>
 
     <!-- Filter & Search Bar -->
     <div class="filter-bar">
       <div class="filter-pills">
-        <button class="filter-pill active" onclick="filterRegion('all')">All Regions (60)</button>
-        <button class="filter-pill" onclick="filterRegion('indore')">📍 Indore (30)</button>
-        <button class="filter-pill" onclick="filterRegion('delhi')">📍 Delhi NCR (10)</button>
-        <button class="filter-pill" onclick="filterRegion('mumbai')">📍 Mumbai (10)</button>
-        <button class="filter-pill" onclick="filterRegion('usa')">📍 USA (10)</button>
+        <button class="filter-pill active" onclick="filterRegion('all', event)">All Regions (60)</button>
+        <button class="filter-pill" onclick="filterRegion('indore', event)">📍 Indore (30)</button>
+        <button class="filter-pill" onclick="filterRegion('delhi', event)">📍 Delhi NCR (10)</button>
+        <button class="filter-pill" onclick="filterRegion('mumbai', event)">📍 Mumbai (10)</button>
+        <button class="filter-pill" onclick="filterRegion('usa', event)">📍 USA (10)</button>
       </div>
       <input type="text" id="searchInput" class="search-input" placeholder="Search business, city, or niche..." oninput="searchLeads()" />
     </div>
@@ -360,6 +472,21 @@
       Mark Zap Lead Finder Pro • 60 Major Prospect Companies Showcase • Powered by Agent-Reach Engine
     </footer>
   </main>
+
+  <!-- Proposal Modal -->
+  <div id="proposalModal" class="modal-overlay" style="display: none;">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 id="modalTitle" style="font-size: 18px; font-weight: 700; color: #30D158;">✉️ Custom Sales Proposal</h3>
+        <button onclick="closeProposalModal()" style="background: none; border: none; color: #fff; font-size: 18px; cursor: pointer;">✕</button>
+      </div>
+      <div id="modalMeta" style="font-size: 13px; color: rgba(255,255,255,0.7); margin-bottom: 14px;"></div>
+      <div id="modalText" style="background: #070907; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 18px; font-size: 13.5px; line-height: 1.6; font-family: monospace; color: #d4d4d4; white-space: pre-wrap;"></div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
+        <button onclick="copyModalProposal()" style="background: #30D158; color: #000; border: none; border-radius: 8px; padding: 8px 18px; font-weight: 700; font-size: 13px; cursor: pointer;">📋 Copy Proposal Text</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const LEADS_DATA = [
@@ -406,14 +533,14 @@
         card.className = 'lead-card';
         card.innerHTML = `
           <div>
-            <div class="card-top">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
               <div>
                 <div class="card-title">${lead.name}</div>
                 <div class="card-location">${lead.type} • ${lead.loc}</div>
               </div>
               <span class="status-badge">❌ No Website</span>
             </div>
-            <div class="card-meta" style="margin-top:12px;">
+            <div class="card-meta" style="margin-top:14px;">
               <div class="meta-item"><strong>Est. Revenue:</strong> <span>${lead.rev}</span></div>
               <div class="meta-item"><strong>Rating:</strong> <span>${lead.rating}</span></div>
               <div class="meta-item"><strong>Phone:</strong> <span>${lead.phone}</span></div>
@@ -424,18 +551,18 @@
             <strong>💡 Why They Will Build From Us:</strong> ${lead.why}
           </div>
           <div class="card-actions">
-            <a href="${lead.gmaps}" target="_blank" class="btn-maps">📍 Open Google Maps</a>
-            <a href="tel:${lead.phone}" class="btn-phone">📞 Call Business</a>
+            <a href="${lead.gmaps}" target="_blank" class="btn-maps">📍 Google Maps</a>
+            <button class="btn-proposal" onclick="openProposalModal('${lead.name.replace(/'/g, "\\'")}', '${lead.email}', '${lead.loc.replace(/'/g, "\\'")}', '${lead.phone}')">✅ Generate Proposal</button>
           </div>
         `;
         grid.appendChild(card);
       });
     }
 
-    function filterRegion(region) {
+    function filterRegion(region, evt) {
       activeFilter = region;
       document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      if (evt) evt.target.classList.add('active');
       searchLeads();
     }
 
@@ -447,6 +574,37 @@
         return matchesRegion && matchesQuery;
       });
       renderLeads(filtered);
+    }
+
+    function openProposalModal(name, email, loc, phone) {
+      document.getElementById('modalTitle').innerText = `✉️ Custom Proposal for ${name}`;
+      document.getElementById('modalMeta').innerText = `Target: ${name} (${email}) • ${loc}`;
+      document.getElementById('modalText').innerText = 
+`Subject: High-converting website proposal for ${name}
+
+Hi Team ${name},
+
+I came across ${name} on Google Maps in ${loc}. You have an impressive reputation, but I noticed you currently do not have a dedicated online booking website.
+
+At Mark Zap, we build modern, high-speed websites for local businesses. Based on your location and lead volume, a custom website with online appointment booking can capture an estimated 30+ new customer bookings every week.
+
+Would you be open to a 5-minute preview of a custom website design concept we prepared for ${name}?
+
+Best regards,
+Mark Zap Digital Agency
+Phone: ${phone}`;
+      
+      document.getElementById('proposalModal').style.display = 'flex';
+    }
+
+    function closeProposalModal() {
+      document.getElementById('proposalModal').style.display = 'none';
+    }
+
+    function copyModalProposal() {
+      const text = document.getElementById('modalText').innerText;
+      navigator.clipboard.writeText(text);
+      alert('Proposal text copied to clipboard!');
     }
 
     function downloadAll60PDF() {
