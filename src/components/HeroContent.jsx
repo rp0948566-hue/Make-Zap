@@ -31,7 +31,19 @@ export const HeroContent = ({ activeQuery, onInitialSubmit }) => {
   }
 
   return (
-    <div className="hero-content-container">
+    <div 
+      style={{
+        width: '100%',
+        maxWidth: '740px',
+        minHeight: 'calc(100vh - 200px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '0 20px',
+        boxSizing: 'border-box',
+        margin: '0 auto'
+      }}
+    >
       {/* Search Input Box */}
       <SearchInputBox onSubmit={onInitialSubmit} />
     </div>

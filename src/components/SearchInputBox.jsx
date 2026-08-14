@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { AISparkleIcon, UpArrowIcon, PaperclipIcon, SearchIcon, CodeIcon } from './Icons';
 
-export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search leads..." }) => {
+export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search..." }) => {
   const [text, setText] = useState('');
   const [attachedFile, setAttachedFile] = useState(null);
   const [showCommandsMenu, setShowCommandsMenu] = useState(false);
@@ -24,6 +24,11 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
   const handleTextChange = (e) => {
     const val = e.target.value.slice(0, 3000);
     setText(val);
+
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    }
 
     const lastSlashIndex = val.lastIndexOf('/');
     if (lastSlashIndex !== -1 && (lastSlashIndex === 0 || val[lastSlashIndex - 1] === ' ')) {
@@ -59,6 +64,9 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
     setText('');
     setAttachedFile(null);
     setShowCommandsMenu(false);
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -75,11 +83,11 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
       style={{
         maxWidth: '728px',
         width: '100%',
-        borderRadius: '22px',
+        borderRadius: '24px',
         backgroundColor: 'rgba(25, 32, 25, 0.42)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
-        padding: '14px 14px 14px 14px',
+        padding: '14px',
         boxSizing: 'border-box',
         border: '1px solid rgba(255, 255, 255, 0.18)',
         boxShadow: '0 20px 50px rgba(0, 0, 0, 0.25)',
@@ -155,8 +163,8 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
         style={{
           width: '100%',
           backgroundColor: 'rgba(255, 255, 255, 0.96)',
-          borderRadius: '16px',
-          padding: '18px 20px',
+          borderRadius: '18px',
+          padding: '18px 22px',
           boxSizing: 'border-box',
           boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
           display: 'flex',
@@ -192,7 +200,7 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
         )}
 
         {/* Top portion inside white card: Textarea + Submit Arrow */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '14px' }}>
           <textarea
             ref={textareaRef}
             rows={1}
@@ -210,7 +218,8 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
               fontSize: '16px',
               color: '#000000',
               resize: 'none',
-              lineHeight: '1.4',
+              overflow: 'hidden',
+              lineHeight: '1.45',
               padding: 0
             }}
           />
@@ -218,9 +227,9 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
             onClick={handleSend}
             aria-label="Submit search"
             style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '10px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '12px',
               backgroundColor: text.trim() || attachedFile ? '#000000' : 'rgba(0, 0, 0, 0.65)',
               color: '#ffffff',
               border: 'none',
@@ -229,7 +238,7 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
               justifyContent: 'center',
               cursor: 'pointer',
               flexShrink: 0,
-              transition: 'transform 0.15s ease, opacity 0.15s ease, background-color 0.15s ease'
+              transition: 'transform 0.15s ease, background-color 0.15s ease'
             }}
             className="btn-submit"
           >
@@ -243,7 +252,7 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: '16px',
+            marginTop: '14px',
             userSelect: 'none'
           }}
         >
