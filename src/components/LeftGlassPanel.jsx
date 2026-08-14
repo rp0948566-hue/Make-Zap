@@ -14,11 +14,17 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
 
   const [historyItems, setHistoryItems] = useState([
     { title: "find me a lead in indore on restaurant without website", time: "Just now" },
-    { title: "Indore Restaurant Lead Discovery (10 Prospects)", time: "10 mins ago" },
-    { title: "Miami Auto Workshops Without Website", time: "2 hours ago" },
-    { title: "Austin Plumbing Contractors Target Leads", time: "Yesterday" },
-    { title: "Dallas CPA Tax Firms Web Outreach", time: "3 days ago" },
-    { title: "NY Artisan Bakery Corporate Catering Leads", time: "4 days ago" }
+    { title: "10 Indore Restaurants Without Website (Vijay Nagar, Rajwada)", time: "10 mins ago" },
+    { title: "Miami Auto Workshops Without Website ($850K-$1.5M/yr)", time: "2 hours ago" },
+    { title: "Austin Plumbing Contractors Target Leads ($900K-$1.8M/yr)", time: "Yesterday" },
+    { title: "Dallas CPA Tax Firms Web Outreach ($750K-$1.4M/yr)", time: "2 days ago" },
+    { title: "NY Artisan Bakery Corporate Catering Leads ($600K-$1.1M/yr)", time: "3 days ago" },
+    { title: "San Francisco Commercial Roofing & Solar Leads", time: "4 days ago" },
+    { title: "Seattle Physical Therapy & Rehab Clinics", time: "5 days ago" },
+    { title: "Chicago HVAC & Climate Control Contractors", time: "6 days ago" },
+    { title: "Mumbai Fine Dining Restaurants Without Website", time: "1 week ago" },
+    { title: "Delhi NCR Dental Clinics & Care Centers", time: "1 week ago" },
+    { title: "Bangalore Tech Startups Without Web Landing", time: "2 weeks ago" }
   ]);
 
   const { user, signInWithGoogle, signOut } = useAuth();
@@ -316,8 +322,8 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
             position: 'fixed',
             bottom: '24px',
             left: '80px',
-            width: '330px',
-            maxHeight: '440px',
+            width: '340px',
+            maxHeight: '480px',
             backgroundColor: '#0c100e',
             border: '1px solid rgba(255, 255, 255, 0.16)',
             borderRadius: '22px',
@@ -347,7 +353,10 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
               >
                 <HistoryIcon className="w-4 h-4" />
               </div>
-              <span style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>History Log</span>
+              <div>
+                <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff' }}>History Log</div>
+                <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)' }}>Scroll to view all past searches</div>
+              </div>
             </div>
             <button
               onClick={() => setShowHistory(false)}
@@ -372,13 +381,14 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
 
           {/* Scrollable History Items Container */}
           <div 
+            className="scrollable-history"
             style={{ 
               display: 'flex', 
               flexDirection: 'column', 
               gap: '10px',
               overflowY: 'auto',
-              maxHeight: '360px',
-              paddingRight: '4px'
+              maxHeight: '380px',
+              paddingRight: '6px'
             }}
           >
             {historyItems.map((item, idx) => (
@@ -391,7 +401,7 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
                   backgroundColor: 'rgba(255, 255, 255, 0.06)',
                   border: '1px solid rgba(255, 255, 255, 0.08)',
                   cursor: 'pointer',
-                  animationDelay: `${(idx + 1) * 0.07}s`,
+                  animationDelay: `${(idx + 1) * 0.04}s`,
                   transition: 'background-color 0.18s ease, transform 0.18s ease'
                 }}
                 className="glass-panel-item history-pop-item"
