@@ -7,16 +7,18 @@ import {
 import { useAuth } from '../AuthContext';
 import { fetchUserChats } from '../chatService';
 
-export const LeftGlassPanel = ({ onNewChat }) => {
+export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
   const [showHistory, setShowHistory] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   const [historyItems, setHistoryItems] = useState([
-    { title: "Lead Generation Strategy Q3", time: "10 mins ago" },
-    { title: "Sales Funnel Conversion Metrics", time: "2 hours ago" },
-    { title: "Automated Email Sequences", time: "Yesterday" },
-    { title: "Competitor Market Insights", time: "3 days ago" },
+    { title: "find me a lead in indore on restaurant without website", time: "Just now" },
+    { title: "Indore Restaurant Lead Discovery (10 Prospects)", time: "10 mins ago" },
+    { title: "Miami Auto Workshops Without Website", time: "2 hours ago" },
+    { title: "Austin Plumbing Contractors Target Leads", time: "Yesterday" },
+    { title: "Dallas CPA Tax Firms Web Outreach", time: "3 days ago" },
+    { title: "NY Artisan Bakery Corporate Catering Leads", time: "4 days ago" }
   ]);
 
   const { user, signInWithGoogle, signOut } = useAuth();
@@ -33,6 +35,13 @@ export const LeftGlassPanel = ({ onNewChat }) => {
       });
     }
   }, [user]);
+
+  const handleItemClick = (title) => {
+    if (onSelectHistoryQuery) {
+      onSelectHistoryQuery(title);
+    }
+    setShowHistory(false);
+  };
 
   // Compute initials or Google User photo
   const userInitial = user?.user_metadata?.full_name 
@@ -101,7 +110,7 @@ export const LeftGlassPanel = ({ onNewChat }) => {
               setShowHistory(!showHistory);
               setShowProfileMenu(false);
             }}
-            title="History"
+            title="History Log & Past Chats"
             aria-label="History"
             style={{
               width: '40px',
@@ -203,38 +212,47 @@ export const LeftGlassPanel = ({ onNewChat }) => {
           className="history-paper-drawer"
           style={{
             position: 'fixed',
-            bottom: '20px',
-            left: '78px',
-            width: '210px',
-            backgroundColor: '#0e1210',
+            bottom: '24px',
+            left: '80px',
+            width: '240px',
+            backgroundColor: '#0c100e',
             border: '1px solid rgba(255, 255, 255, 0.16)',
-            borderRadius: '16px',
-            padding: '8px',
+            borderRadius: '18px',
+            padding: '12px',
             boxSizing: 'border-box',
-            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.6)',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.6)',
             zIndex: 45,
             color: '#ffffff',
             display: 'flex',
             flexDirection: 'column',
-            gap: '4px',
+            gap: '8px',
             fontFamily: "'Schibsted Grotesk', 'Inter', sans-serif"
           }}
         >
-          {/* User Account Info Header */}
-          <div style={{ padding: '8px 10px', borderBottom: '1px solid rgba(255, 255, 255, 0.08)', marginBottom: '4px' }}>
-            <div style={{ fontSize: '13px', fontWeight: 700, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {user?.user_metadata?.full_name || user?.email || 'Mark Zap Guest'}
+          {/* User Profile Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '6px 8px' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', overflow: 'hidden', backgroundColor: '#30D158', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#000', fontWeight: 700 }}>
+              {userAvatar ? (
+                <img src={userAvatar} alt="Profile" referrerPolicy="no-referrer" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : userInitial}
             </div>
-            <div style={{ fontSize: '10.5px', color: '#30D158', fontWeight: 600, marginTop: '2px' }}>
-              {user ? 'Google Account Active' : 'Guest Mode'}
+            <div style={{ overflow: 'hidden' }}>
+              <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {user?.user_metadata?.full_name || 'Rudra Account'}
+              </div>
+              <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {user?.email || 'markzap.lead@pro'}
+              </div>
             </div>
           </div>
+
+          <div style={{ height: '1px', backgroundColor: 'rgba(255, 255, 255, 0.1)', margin: '2px 0' }} />
 
           {/* Option 1: Settings */}
           <button
             onClick={() => {
-              setShowProfileMenu(false);
               setShowSettingsModal(true);
+              setShowProfileMenu(false);
             }}
             style={{
               display: 'flex',
@@ -257,15 +275,15 @@ export const LeftGlassPanel = ({ onNewChat }) => {
             <span>Settings</span>
           </button>
 
-          {/* Option 2: Login / Logout */}
+          {/* Option 2: Google Login / Sign Out */}
           <button
             onClick={() => {
-              setShowProfileMenu(false);
               if (user) {
                 signOut();
               } else {
                 signInWithGoogle();
               }
+              setShowProfileMenu(false);
             }}
             style={{
               display: 'flex',
@@ -290,7 +308,7 @@ export const LeftGlassPanel = ({ onNewChat }) => {
         </div>
       )}
 
-      {/* History Pop-up Drawer */}
+      {/* Scrollable History Pop-up Drawer */}
       {showHistory && (
         <div
           className="history-paper-drawer"
@@ -298,7 +316,8 @@ export const LeftGlassPanel = ({ onNewChat }) => {
             position: 'fixed',
             bottom: '24px',
             left: '80px',
-            width: '310px',
+            width: '330px',
+            maxHeight: '440px',
             backgroundColor: '#0c100e',
             border: '1px solid rgba(255, 255, 255, 0.16)',
             borderRadius: '22px',
@@ -307,11 +326,13 @@ export const LeftGlassPanel = ({ onNewChat }) => {
             boxShadow: '0 30px 70px rgba(0, 0, 0, 0.6)',
             zIndex: 45,
             color: '#ffffff',
-            fontFamily: "'Schibsted Grotesk', 'Inter', sans-serif"
+            fontFamily: "'Schibsted Grotesk', 'Inter', sans-serif",
+            display: 'flex',
+            flexDirection: 'column'
           }}
         >
           {/* Drawer Header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div 
                 style={{
@@ -349,11 +370,21 @@ export const LeftGlassPanel = ({ onNewChat }) => {
             </button>
           </div>
 
-          {/* History Items */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {/* Scrollable History Items Container */}
+          <div 
+            style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              gap: '10px',
+              overflowY: 'auto',
+              maxHeight: '360px',
+              paddingRight: '4px'
+            }}
+          >
             {historyItems.map((item, idx) => (
               <div
                 key={idx}
+                onClick={() => handleItemClick(item.title)}
                 style={{
                   padding: '12px 14px',
                   borderRadius: '14px',
@@ -365,11 +396,11 @@ export const LeftGlassPanel = ({ onNewChat }) => {
                 }}
                 className="glass-panel-item history-pop-item"
               >
-                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#ffffff', marginBottom: '3px' }}>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#ffffff', marginBottom: '3px', lineHeight: '1.35' }}>
                   {item.title}
                 </div>
-                <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', fontWeight: 400 }}>
-                  {item.time}
+                <div style={{ fontSize: '11px', color: '#30D158', fontWeight: 500 }}>
+                  🕒 {item.time} • Click to load session
                 </div>
               </div>
             ))}
@@ -401,40 +432,37 @@ export const LeftGlassPanel = ({ onNewChat }) => {
               backgroundColor: '#0c100e',
               border: '1px solid rgba(255, 255, 255, 0.16)',
               borderRadius: '28px',
-              boxShadow: '0 40px 100px rgba(0, 0, 0, 0.95)',
+              padding: '36px',
+              boxSizing: 'border-box',
+              boxShadow: '0 40px 100px rgba(0, 0, 0, 0.9)',
+              color: '#ffffff',
               display: 'flex',
               flexDirection: 'column',
-              overflow: 'hidden',
-              color: '#ffffff',
-              boxSizing: 'border-box'
+              justifyContent: 'space-between',
+              position: 'relative'
             }}
           >
             {/* Modal Header */}
-            <div
-              style={{
-                height: '64px',
-                padding: '0 28px',
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                backgroundColor: '#121815'
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '20px' }}>⚙️</span>
-                <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>Settings</span>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.10)', paddingBottom: '20px' }}>
+              <div>
+                <h2 style={{ fontSize: '24px', fontWeight: 800, margin: 0, color: '#ffffff' }}>
+                  ⚙️ Workspace & Engine Settings
+                </h2>
+                <p style={{ fontSize: '13.5px', color: 'rgba(255, 255, 255, 0.55)', margin: '4px 0 0 0' }}>
+                  Manage AI Lead Engine, Supabase Auth, and API integrations
+                </p>
               </div>
+
               <button
                 onClick={() => setShowSettingsModal(false)}
                 style={{
-                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.08)',
+                  border: 'none',
                   borderRadius: '50%',
-                  width: '32px',
-                  height: '32px',
+                  width: '36px',
+                  height: '36px',
                   color: '#ffffff',
-                  fontSize: '14px',
+                  fontSize: '16px',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -446,43 +474,66 @@ export const LeftGlassPanel = ({ onNewChat }) => {
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div style={{ flex: 1, padding: '28px 32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '14.5px', fontWeight: 600 }}>Cloud Workspace Sync</div>
-                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>Real-time chat persistence & data backup</div>
-                  </div>
-                  <span style={{ fontSize: '12.5px', color: '#30D158', fontWeight: 700, backgroundColor: 'rgba(48,209,88,0.15)', padding: '4px 12px', borderRadius: '8px' }}>
-                    Active
-                  </span>
-                </div>
-
-                <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <div style={{ fontSize: '14.5px', fontWeight: 600 }}>Account Status</div>
-                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
-                      {user ? user.email : 'Not logged in'}
-                    </div>
-                  </div>
-                  <button
-                    onClick={user ? signOut : signInWithGoogle}
-                    style={{
-                      backgroundColor: user ? 'rgba(255,69,58,0.15)' : 'rgba(48,209,88,0.15)',
-                      color: user ? '#ff453a' : '#30D158',
-                      border: 'none',
-                      borderRadius: '8px',
-                      padding: '8px 16px',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {user ? 'Sign Out' : 'Sign in with Google'}
-                  </button>
+            {/* Modal Body: Settings Options */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', flex: 1, margin: '24px 0', overflowY: 'auto' }}>
+              {/* Box 1: General Workspace */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '20px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 12px 0', color: '#ffffff' }}>🌐 General</h3>
+                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.6' }}>
+                  <div><strong>App Name:</strong> Mark Zap Lead Finder</div>
+                  <div><strong>Version:</strong> v1.0.0 Pro</div>
+                  <div><strong>Theme:</strong> Dark Solid Glass (No Blur)</div>
                 </div>
               </div>
+
+              {/* Box 2: Lead Engine Config */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '20px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 12px 0', color: '#30D158' }}>⚡ Lead Engine</h3>
+                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.6' }}>
+                  <div><strong>Provider Key:</strong> AQ.Ab8RN6J... (Active)</div>
+                  <div><strong>Project ID:</strong> 171579689146</div>
+                  <div><strong>Filter Rules:</strong> Mid-Range (No Website)</div>
+                </div>
+              </div>
+
+              {/* Box 3: Supabase Cloud */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '20px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 12px 0', color: '#0A84FF' }}>⚡ Supabase Auth</h3>
+                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.6' }}>
+                  <div><strong>Supabase Host:</strong> laubhpdscqcfvnwdwakh</div>
+                  <div><strong>OAuth Provider:</strong> Google Authorized</div>
+                  <div><strong>Status:</strong> {user ? `Logged in as ${user.email}` : 'Guest Mode (Local Storage)'}</div>
+                </div>
+              </div>
+
+              {/* Box 4: Agent-Reach-main */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '20px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 12px 0', color: '#FF9F0A' }}>📁 Agent-Reach-main</h3>
+                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.6' }}>
+                  <div><strong>Status:</strong> Integrated in /code workspace</div>
+                  <div><strong>CLI Modules:</strong> cli.py, core.py, config.py</div>
+                  <div><strong>Target:</strong> Mid-range businesses</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.10)', paddingTop: '18px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                onClick={() => setShowSettingsModal(false)}
+                style={{
+                  backgroundColor: '#ffffff',
+                  color: '#000000',
+                  border: 'none',
+                  borderRadius: '12px',
+                  padding: '10px 24px',
+                  fontWeight: 700,
+                  fontSize: '14px',
+                  cursor: 'pointer'
+                }}
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>

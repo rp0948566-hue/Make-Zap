@@ -17,7 +17,7 @@ export default function App() {
   };
 
   const handleInitialSubmit = (queryText) => {
-    if (!queryText.trim()) return;
+    if (!queryText || !queryText.trim()) return;
     setActiveQuery(queryText);
     setIsChatMode(true);
   };
@@ -38,8 +38,11 @@ export default function App() {
         {/* Loop Video Background */}
         <VideoBackground />
 
-        {/* Left Blur Glass Side Panel */}
-        <LeftGlassPanel onNewChat={handleNewChat} />
+        {/* Left Blur Glass Side Panel with History Callback */}
+        <LeftGlassPanel 
+          onNewChat={handleNewChat} 
+          onSelectHistoryQuery={handleInitialSubmit} 
+        />
 
         {/* Main Container Overlay */}
         <div 
@@ -59,11 +62,14 @@ export default function App() {
             <NavigationBar onLoginClick={() => setShowLoginModal(true)} />
           )}
 
-          {/* Hero Content / Chat View */}
-          <HeroContent activeQuery={activeQuery} onInitialSubmit={handleInitialSubmit} />
+          {/* Main Hero / Chat / Code Studio Content */}
+          <HeroContent 
+            activeQuery={activeQuery}
+            onInitialSubmit={handleInitialSubmit}
+          />
         </div>
 
-        {/* Signal Log In / Google OAuth Modal */}
+        {/* Auth Modal */}
         {showLoginModal && (
           <LoginModal onClose={() => setShowLoginModal(false)} />
         )}
