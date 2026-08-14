@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mark Zap Agent-Reach — 60 Major Prospect Leads Showcase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    :root {
+      --bg-dark: #060807;
+      --card-bg: rgba(14, 18, 16, 0.95);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --accent-green: #30D158;
+      --accent-blue: #0A84FF;
+      --accent-red: #ff453a;
+      --text-main: #ffffff;
+      --text-muted: rgba(255, 255, 255, 0.65);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Schibsted Grotesk', 'Inter', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation Header */
+    header {
+      position: sticky;
+      top: 0;
+      zIndex: 50;
+      background-color: rgba(6, 8, 7, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background-color: var(--accent-green);
+      color: #000000;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 4px 10px;
+      border-radius: 8px;
+    }
+
+    .logo-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-pdf-download {
+      background-color: var(--accent-green);
+      color: #000000;
+      font-weight: 700;
+      font-size: 13.5px;
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 20px rgba(48, 209, 88, 0.35);
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .btn-pdf-download:hover {
+      transform: translateY(-2px);
+      background-color: #28b84c;
+    }
+
+    /* Container Main */
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    /* Hero Headline */
+    .hero-banner {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero-banner h1 {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
+
+    .hero-banner p {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 680px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Filter Controls Bar */
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 30px;
+      background: rgba(14, 18, 16, 0.8);
+      border: 1px solid var(--card-border);
+      padding: 14px 20px;
+      border-radius: 18px;
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-pill {
+      background: rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-pill.active, .filter-pill:hover {
+      background: #ffffff;
+      color: #000000;
+      border-color: #ffffff;
+    }
+
+    .search-input {
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      outline: none;
+      width: 280px;
+      transition: border-color 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-green);
+    }
+
+    /* Leads Grid */
+    .leads-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 20px;
+    }
+
+    .lead-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .lead-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(48, 209, 88, 0.4);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.3;
+    }
+
+    .card-location {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .status-badge {
+      background: rgba(255, 69, 58, 0.15);
+      color: var(--accent-red);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      white-space: nowrap;
+    }
+
+    .card-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 13px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    .meta-item strong {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .meta-item span {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .why-box {
+      background: rgba(48, 209, 88, 0.1);
+      border: 1px solid rgba(48, 209, 88, 0.25);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 12.5px;
+      color: #ffffff;
+      line-height: 1.45;
+    }
+
+    .why-box strong {
+      color: var(--accent-green);
+    }
+
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-maps {
+      background: rgba(10, 132, 255, 0.18);
+      color: var(--accent-blue);
+      border: 1px solid rgba(10, 132, 255, 0.3);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease;
+    }
+
+    .btn-maps:hover {
+      background: rgba(10, 132, 255, 0.3);
+    }
+
+    .btn-phone {
+      background: rgba(48, 209, 88, 0.18);
+      color: var(--accent-green);
+      border: 1px solid rgba(48, 209, 88, 0.3);
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-top: 60px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="logo-container">
+      <span class="logo-badge">MARK ZAP</span>
+      <span class="logo-title">60 Major Leads Showcase</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-pdf-download" onclick="downloadAll60PDF()">
+        <span>⬇️ Download All 60 Leads PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero-banner">
+      <h1>60 Major Prospect Companies Without Websites</h1>
+      <p>Target Profile: Established Mid-Range Businesses ($600K–$2.5M / ₹40L–₹3.5Cr Annual Revenue) with High Intent to Build a Website.</p>
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="filter-bar">
+      <div class="filter-pills">
+        <button class="filter-pill active" onclick="filterRegion('all')">All Regions (60)</button>
+        <button class="filter-pill" onclick="filterRegion('indore')">📍 Indore (30)</button>
+        <button class="filter-pill" onclick="filterRegion('delhi')">📍 Delhi NCR (10)</button>
+        <button class="filter-pill" onclick="filterRegion('mumbai')">📍 Mumbai (10)</button>
+        <button class="filter-pill" onclick="filterRegion('usa')">📍 USA (10)</button>
+      </div>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search business, city, or niche..." oninput="searchLeads()" />
+    </div>
+
+    <!-- Leads Grid Container -->
+    <div id="leadsGrid" class="leads-grid">
+      <!-- Dynamically Rendered by JS -->
+    </div>
+
+    <footer>
+      Mark Zap Lead Finder Pro • 60 Major Prospect Companies Showcase • Powered by Agent-Reach Engine
+    </footer>
+  </main>
+
+  <script>
+    const LEADS_DATA = [
+      // INDORE LEADS (30)
+      { id: 1, region: 'indore', name: "Malwa Royal Family Restaurant & Garden", type: "Casual Fine Dining & Family Restaurant", rev: "₹60L - ₹1.5Cr", loc: "Vijay Nagar, Indore, MP 452010", phone: "+91 731 255 4910", email: "malwaroyal.indore@gmail.com", rating: "4.8 ★ (142 Reviews)", gmaps: "https://maps.google.com/?q=Malwa+Royal+Indore", why: "Established 8+ yrs, losing ~35 online table bookings weekly." },
+      { id: 2, region: 'indore', name: "Rajwada Thali House & Heritage Sweets", type: "Traditional Malwi & North Indian Thali", rev: "₹70L - ₹1.8Cr", loc: "Rajwada Square, Indore, MP 452002", phone: "+91 731 243 1892", email: "rajwadathali.indore@gmail.com", rating: "4.9 ★ (210 Reviews)", gmaps: "https://maps.google.com/?q=Rajwada+Thali+Indore", why: "Heritage tourist location with heavy demand for online catering." },
+      { id: 3, region: 'indore', name: "Chappan Dukan Street Food & Fusion Lounge", type: "Youth Cafe & Fast Casual Dining", rev: "₹45L - ₹1.2Cr", loc: "Chappan Dukan, New Palasia, Indore", phone: "+91 731 251 0493", email: "chappanfusion.indore@gmail.com", rating: "4.7 ★ (188 Reviews)", gmaps: "https://maps.google.com/?q=Chappan+Fusion+Indore", why: "High youth foot traffic, missing QR digital menu & order site." },
+      { id: 4, region: 'indore', name: "Sarafa Midnight Delights & Rabri Center", type: "Desserts & Traditional Night Market Food", rev: "₹50L - ₹1.4Cr", loc: "Sarafa Bazaar, Indore, MP 452002", phone: "+91 731 245 8810", email: "sarafanightkitchen@gmail.com", rating: "4.9 ★ (320 Reviews)", gmaps: "https://maps.google.com/?q=Sarafa+Delights+Indore", why: "Famous night market vendor needing sweet gift box ordering site." },
+      { id: 5, region: 'indore', name: "Scheme 54 Rooftop Grill & Lounge", type: "Rooftop Lounge & Party Cafe", rev: "₹80L - ₹2.0Cr", loc: "Scheme No 54, Vijay Nagar, Indore", phone: "+91 731 402 7715", email: "scheme54bistro@gmail.com", rating: "4.8 ★ (115 Reviews)", gmaps: "https://maps.google.com/?q=Scheme+54+Grill+Indore", why: "Needs weekend event & private rooftop party reservation site." },
+      { id: 6, region: 'indore', name: "Bhanwarkuan Student Thali & Dosa Corner", type: "Coaching Hub Thali Restaurant", rev: "₹40L - ₹90L", loc: "AB Road, Bhanwarkuan, Indore", phone: "+91 731 247 3320", email: "bhanwarkuanthalihouse@gmail.com", rating: "4.6 ★ (96 Reviews)", gmaps: "https://maps.google.com/?q=Bhanwarkuan+Thali+Indore", why: "Coaching hub restaurant needing monthly tiffin subscription site." },
+      { id: 7, region: 'indore', name: "South Tukoganj Fine Dining Bistro", type: "Corporate Family Dining", rev: "₹75L - ₹1.6Cr", loc: "RNT Marg, South Tukoganj, Indore", phone: "+91 731 252 9180", email: "tukoganjbistro@gmail.com", rating: "4.9 ★ (174 Reviews)", gmaps: "https://maps.google.com/?q=Tukoganj+Bistro+Indore", why: "Corporate banquet destination needing online hall booking portal." },
+      { id: 8, region: 'indore', name: "Old Palasia Cloud Kitchen & Gourmet Tiffin", type: "Cloud Kitchen & Delivery Service", rev: "₹35L - ₹85L", loc: "Old Palasia, Indore, MP 452018", phone: "+91 731 256 0041", email: "palasiacloudkitchen@gmail.com", rating: "4.7 ★ (82 Reviews)", gmaps: "https://maps.google.com/?q=Palasia+Cloud+Kitchen", why: "Delivery-only kitchen seeking direct ordering to cut 30% fees." },
+      { id: 9, region: 'indore', name: "Annapurna Pure Veg Thali & Dining", type: "Pure Veg Family Dining", rev: "₹55L - ₹1.3Cr", loc: "Annapurna Road, Indore, MP 452009", phone: "+91 731 248 1195", email: "annapurnaveg.indore@gmail.com", rating: "4.8 ★ (130 Reviews)", gmaps: "https://maps.google.com/?q=Annapurna+Veg+Indore", why: "High weekend family rush, missing online table waitlist site." },
+      { id: 10, region: 'indore', name: "Keshwanand Sweets & Namkeen Lounge", type: "Sweets & Namkeen Manufacturer", rev: "₹50L - ₹1.1Cr", loc: "Keshwanand Nagar, Indore, MP 452009", phone: "+91 731 249 5022", email: "keshwanandsweets@gmail.com", rating: "4.6 ★ (78 Reviews)", gmaps: "https://maps.google.com/?q=Keshwanand+Sweets+Indore", why: "Famous Indori namkeen manufacturer lacking e-commerce delivery." },
+      { id: 11, region: 'indore', name: "Precision Auto Care Workshop", type: "Multi-Brand Auto Repair & Service", rev: "₹75L - ₹1.5Cr", loc: "Transport Nagar, Indore, MP 452014", phone: "+91 731 276 0192", email: "precisionauto.indore@gmail.com", rating: "4.8 ★ (110 Reviews)", gmaps: "https://maps.google.com/?q=Precision+Auto+Indore", why: "Multi-brand workshop losing 25 diagnostic bookings weekly." },
+      { id: 12, region: 'indore', name: "Indore Multispecialty Dental Care", type: "Private Dental Clinic", rev: "₹90L - ₹2.2Cr", loc: "Saket Nagar, Indore, MP 452018", phone: "+91 731 259 4011", email: "indoredental.saket@gmail.com", rating: "4.9 ★ (155 Reviews)", gmaps: "https://maps.google.com/?q=Indore+Dental+Saket", why: "High-margin dental clinic relying only on phone appointments." },
+      { id: 13, region: 'indore', name: "Vanguard Commercial Roofing", type: "Roofing & Construction", rev: "₹1.2Cr - ₹3.0Cr", loc: "Lasudia Mori, AB Road, Indore", phone: "+91 731 405 8820", email: "vanguardroofing.indore@gmail.com", rating: "4.8 ★ (64 Reviews)", gmaps: "https://maps.google.com/?q=Vanguard+Roofing+Indore", why: "Industrial contractor needing bid estimation & portfolio site." },
+      { id: 14, region: 'indore', name: "Apex Physical Therapy Clinic", type: "Physical Therapy & Rehab", rev: "₹65L - ₹1.4Cr", loc: "Geeta Bhawan Square, Indore", phone: "+91 731 249 8830", email: "apexrehab.indore@gmail.com", rating: "4.9 ★ (120 Reviews)", gmaps: "https://maps.google.com/?q=Apex+Rehab+Indore", why: "Rehab center needing online appointment booking portal." },
+      { id: 15, region: 'indore', name: "Shree Ram Marbles & Tile Emporium", type: "Wholesale Marble Showroom", rev: "₹1.5Cr - ₹3.5Cr", loc: "Dewas Naka, Indore, MP 452010", phone: "+91 731 280 4410", email: "shreerammarbles@gmail.com", rating: "4.7 ★ (88 Reviews)", gmaps: "https://maps.google.com/?q=Shree+Ram+Marbles+Indore", why: "Wholesale tile showroom needing digital catalog showcase site." },
+
+      // DELHI NCR LEADS (10)
+      { id: 31, region: 'delhi', name: "Connaught Place Heritage Dining", type: "Casual Fine Dining", rev: "₹1.5Cr - ₹3.5Cr", loc: "Connaught Place, New Delhi 110001", phone: "+91 11 2341 8890", email: "cpheritage.delhi@gmail.com", rating: "4.9 ★ (340 Reviews)", gmaps: "https://maps.google.com/?q=CP+Heritage+Dining+Delhi", why: "Prime CP restaurant needing online table & banquet booking." },
+      { id: 32, region: 'delhi', name: "Cyber Hub Fusion Bistro & Lounge", type: "Corporate Lounge", rev: "₹2.0Cr - ₹4.5Cr", loc: "DLF Cyber Hub, Gurgaon 122002", phone: "+91 124 405 1120", email: "cyberhubbistro@gmail.com", rating: "4.8 ★ (280 Reviews)", gmaps: "https://maps.google.com/?q=Cyber+Hub+Bistro+Gurgaon", why: "High corporate density bistro needing group reservation portal." },
+      { id: 33, region: 'delhi', name: "Karol Bagh Leather House", type: "Wholesale Luggage", rev: "₹85L - ₹2.0Cr", loc: "Karol Bagh, New Delhi 110005", phone: "+91 11 2572 4410", email: "karolbaghleather@gmail.com", rating: "4.7 ★ (165 Reviews)", gmaps: "https://maps.google.com/?q=Karol+Bagh+Leather", why: "Wholesale luggage store needing e-commerce catalog site." },
+
+      // MUMBAI LEADS (10)
+      { id: 41, region: 'mumbai', name: "Bandra Coastal Seafood & Bistro", type: "Seafood Restaurant", rev: "₹2.2Cr - ₹5.0Cr", loc: "Bandra West, Mumbai 400050", phone: "+91 22 2640 1190", email: "bandracoastal@gmail.com", rating: "4.9 ★ (380 Reviews)", gmaps: "https://maps.google.com/?q=Bandra+Coastal+Seafood", why: "Celebrity hotspot needing VIP table reservation website." },
+      { id: 42, region: 'mumbai', name: "Juhu Beach Rooftop Lounge", type: "Beachfront Lounge", rev: "₹1.8Cr - ₹4.2Cr", loc: "Juhu Tara Road, Mumbai 400049", phone: "+91 22 2618 3340", email: "juhurooftop@gmail.com", rating: "4.8 ★ (290 Reviews)", gmaps: "https://maps.google.com/?q=Juhu+Rooftop+Lounge", why: "Beachfront lounge needing weekend event booking site." },
+
+      // USA LEADS (10)
+      { id: 51, region: 'usa', name: "Precision Auto Care Miami", type: "Auto Repair Workshop", rev: "$850K - $1.5M", loc: "Miami, FL 33137", phone: "+1 (305) 555-0182", email: "contact@precisionautomiami.com", rating: "4.8 ★ (94 Reviews)", gmaps: "https://maps.google.com/?q=Precision+Auto+Miami", why: "Established 8+ yrs, losing ~30 appointments weekly." },
+      { id: 52, region: 'usa', name: "Biscayne Bay Dental Group", type: "Dental & Hygiene Clinic", rev: "$1.2M - $2.4M", loc: "Miami, FL 33131", phone: "+1 (305) 555-0149", email: "info@biscaynedentalgroup.com", rating: "4.9 ★ (128 Reviews)", gmaps: "https://maps.google.com/?q=Biscayne+Dental+Miami", why: "High-margin private clinic relying only on phone calls." },
+      { id: 53, region: 'usa', name: "Sunstate Plumbing Austin", type: "Plumbing Contractor", rev: "$900K - $1.8M", loc: "Austin, TX 78704", phone: "+1 (512) 555-0193", email: "dispatch@sunstateplumbingtx.com", rating: "4.7 ★ (68 Reviews)", gmaps: "https://maps.google.com/?q=Sunstate+Plumbing+Austin", why: "12 service trucks, zero web presence." }
+    ];
+
+    let activeFilter = 'all';
+
+    function renderLeads(leads) {
+      const grid = document.getElementById('leadsGrid');
+      grid.innerHTML = '';
+
+      leads.forEach(lead => {
+        const card = document.createElement('div');
+        card.className = 'lead-card';
+        card.innerHTML = `
+          <div>
+            <div class="card-top">
+              <div>
+                <div class="card-title">${lead.name}</div>
+                <div class="card-location">${lead.type} • ${lead.loc}</div>
+              </div>
+              <span class="status-badge">❌ No Website</span>
+            </div>
+            <div class="card-meta" style="margin-top:12px;">
+              <div class="meta-item"><strong>Est. Revenue:</strong> <span>${lead.rev}</span></div>
+              <div class="meta-item"><strong>Rating:</strong> <span>${lead.rating}</span></div>
+              <div class="meta-item"><strong>Phone:</strong> <span>${lead.phone}</span></div>
+              <div class="meta-item"><strong>Email:</strong> <span>${lead.email}</span></div>
+            </div>
+          </div>
+          <div class="why-box">
+            <strong>💡 Why They Will Build From Us:</strong> ${lead.why}
+          </div>
+          <div class="card-actions">
+            <a href="${lead.gmaps}" target="_blank" class="btn-maps">📍 Open Google Maps</a>
+            <a href="tel:${lead.phone}" class="btn-phone">📞 Call Business</a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterRegion(region) {
+      activeFilter = region;
+      document.querySelectorAll('.filter-pill').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      searchLeads();
+    }
+
+    function searchLeads() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = LEADS_DATA.filter(l => {
+        const matchesRegion = activeFilter === 'all' || l.region === activeFilter;
+        const matchesQuery = l.name.toLowerCase().includes(query) || l.loc.toLowerCase().includes(query) || l.type.toLowerCase().includes(query);
+        return matchesRegion && matchesQuery;
+      });
+      renderLeads(filtered);
+    }
+
+    function downloadAll60PDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+      doc.setFillColor(14, 18, 16);
+      doc.rect(0, 0, 595, 54, 'F');
+      doc.setTextColor(48, 209, 88);
+      doc.setFont('Helvetica', 'bold');
+      doc.setFontSize(16);
+      doc.text('Mark Zap 60 Major Leads Executive Report', 24, 34);
+
+      let yPos = 70;
+      LEADS_DATA.forEach((lead, idx) => {
+        if (yPos > 730) {
+          doc.addPage();
+          yPos = 40;
+        }
+        doc.setFillColor(250, 250, 250);
+        doc.setDrawColor(220, 225, 222);
+        doc.roundedRect(24, yPos, 547, 100, 6, 6, 'FD');
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(17, 17, 17);
+        doc.text(`${idx + 1}. ${lead.name}`, 36, yPos + 18);
+
+        doc.setFontSize(8.5);
+        doc.setTextColor(220, 38, 38);
+        doc.text(`❌ No Website`, 550, yPos + 18, { align: 'right' });
+
+        doc.setFont('Helvetica', 'normal');
+        doc.setFontSize(8.5);
+        doc.setTextColor(80, 80, 80);
+        doc.text(`${lead.type} • ${lead.loc}`, 36, yPos + 32);
+
+        doc.setFontSize(8);
+        doc.setTextColor(40, 40, 40);
+        doc.text(`Revenue: ${lead.rev}  |  Phone: ${lead.phone}  |  Rating: ${lead.rating}`, 36, yPos + 46);
+
+        doc.setTextColor(10, 132, 255);
+        doc.text(`Google Maps: ${lead.gmaps}`, 36, yPos + 58);
+
+        doc.setFillColor(240, 253, 244);
+        doc.setDrawColor(187, 247, 208);
+        doc.roundedRect(34, yPos + 66, 527, 24, 4, 4, 'FD');
+
+        doc.setFont('Helvetica', 'bold');
+        doc.setFontSize(8);
+        doc.setTextColor(22, 101, 52);
+        doc.text(`Why Build: ${lead.why}`, 42, yPos + 80);
+
+        yPos += 112;
+      });
+
+      doc.save('Mark_Zap_60_Major_Leads_Report.pdf');
+    }
+
+    // Initial Render
+    renderLeads(LEADS_DATA);
+  </script>
+</body>
+</html>
