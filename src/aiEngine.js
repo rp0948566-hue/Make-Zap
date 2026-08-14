@@ -1,6 +1,6 @@
 /**
  * MARK ZAP AI ENGINE — Agent-Reach Mid-Range Lead Finder
- * Clean Intent Processing & Non-Duplicate Lead Card Output
+ * Clean Intent Processing & Full Reset Lead Discovery Output
  */
 
 const MID_RANGE_NO_WEBSITE_DATABASE = [
@@ -68,11 +68,37 @@ const MID_RANGE_NO_WEBSITE_DATABASE = [
     websiteStatus: "❌ No Website (Prime Web Prospect)",
     rating: "4.8 ★ (180 Google Reviews)",
     whyBuildFromUs: "High foot traffic and 180 Google reviews, but missing an event catering menu & online order site for corporate office orders."
+  },
+  {
+    name: "Vanguard Commercial Roofing & Solar",
+    type: "Established Regional Roofing Contractor",
+    revenueEstimate: "$1.4M - $2.8M / year",
+    location: "San Francisco, CA 94102",
+    gmapsUrl: "https://maps.google.com/?q=Vanguard+Roofing+San+Francisco+CA",
+    phone: "+1 (415) 555-0188",
+    email: "estimates@vanguardroofingsf.com",
+    social: "LinkedIn: /company/vanguard-roofing-sf",
+    websiteStatus: "❌ No Website (Prime Web Prospect)",
+    rating: "4.9 ★ (76 Google Reviews)",
+    whyBuildFromUs: "High-ticket commercial contracts requiring project portfolio & instant bid calculation website."
+  },
+  {
+    name: "Apex Physical Therapy & Wellness Clinic",
+    type: "Mid-size Local Healthcare & Rehab Clinic",
+    revenueEstimate: "$800K - $1.6M / year",
+    location: "Seattle, WA 98101",
+    gmapsUrl: "https://maps.google.com/?q=Apex+Physical+Therapy+Seattle+WA",
+    phone: "+1 (206) 555-0134",
+    email: "care@apexptseattle.com",
+    social: "Facebook: @ApexPTSeattle | IG: @apex_pt_seattle",
+    websiteStatus: "❌ No Website (Prime Web Prospect)",
+    rating: "4.8 ★ (110 Google Reviews)",
+    whyBuildFromUs: "Established patient base seeking online appointment scheduling and insurance intake portals."
   }
 ];
 
 /**
- * Smart Intent-Based Response Processor
+ * Smart Intent-Based Response Processor with Clean State Reset
  */
 export const generateMarkZapAIResponse = (userQuery) => {
   const queryLower = userQuery.toLowerCase().trim();
@@ -85,7 +111,7 @@ export const generateMarkZapAIResponse = (userQuery) => {
     return {
       text: `Hello ${userName}! Welcome to Mark Zap AI Lead Finder.\n\n` +
             `I am your AI Lead Generation & Business Intelligence Engine. I can help you discover established mid-range local businesses without websites, complete with Google Maps links, phone numbers, and conversion strategies.\n\n` +
-            `Type a query like "find plumbers in Miami" or "show mid-range leads" to start generating leads!`,
+            `Type a query like "find plumbers in Miami" or "show all mid-range leads" to start generating leads!`,
       type: 'greeting',
       leads: []
     };
@@ -99,11 +125,15 @@ export const generateMarkZapAIResponse = (userQuery) => {
     filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('Austin') || l.location.includes('Dallas'));
   } else if (queryLower.includes('ny') || queryLower.includes('new york')) {
     filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('New York'));
+  } else if (queryLower.includes('sf') || queryLower.includes('san francisco')) {
+    filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('San Francisco'));
+  } else if (queryLower.includes('seattle') || queryLower.includes('wa')) {
+    filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('Seattle'));
   }
 
   return {
     text: `⚡ **Agent-Reach Lead Intelligence Report for "${userQuery}"**\n` +
-          `Discovered **${filteredLeads.length} High-Intent Mid-Range Businesses WITHOUT a Website** ($600K - $2.4M/yr Revenue Segment).`,
+          `Discovered **${filteredLeads.length} High-Intent Mid-Range Businesses WITHOUT a Website** ($600K - $2.8M/yr Revenue Segment).`,
     type: 'mid-range-leads',
     leads: filteredLeads
   };
