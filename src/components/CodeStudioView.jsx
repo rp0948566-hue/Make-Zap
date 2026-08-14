@@ -11,15 +11,16 @@ export const CodeStudioView = ({ initialQuery }) => {
     { 
       id: 2, 
       sender: 'ai', 
-      text: `Code generation & clone session initialized for "${initialQuery.replace('/code', '').trim() || 'Website Clone & Downloader'}". Workspace active.` 
+      text: `Agent-Reach-main lead discovery session initialized for "${initialQuery.replace('/code', '').trim() || 'Website Clone & Agent-Reach'}". Workspace active.` 
     }
   ]);
   const [deviceMode, setDeviceMode] = useState('desktop'); // 'mobile' | 'desktop'
   const [panelTabMode, setPanelTabMode] = useState('code'); // Auto-select /code mode
   const [isPaneVisible, setIsPaneVisible] = useState(true);
-  const [selectedFile, setSelectedFile] = useState('index.html');
+  const [selectedFile, setSelectedFile] = useState('cli.py');
   const [folder1Open, setFolder1Open] = useState(true);
   const [folder2Open, setFolder2Open] = useState(true);
+  const [folder3Open, setFolder3Open] = useState(true);
 
   // Sync session to Supabase
   useEffect(() => {
@@ -34,7 +35,7 @@ export const CodeStudioView = ({ initialQuery }) => {
     const aiMsg = {
       id: Date.now() + 1,
       sender: 'ai',
-      text: `Updated clone configuration for "${queryText}". Workspace files updated.`
+      text: `Updated Agent-Reach configuration for "${queryText}". Workspace files updated.`
     };
     setMessages((prev) => [...prev, userMsg, aiMsg]);
   };
@@ -56,7 +57,77 @@ export const CodeStudioView = ({ initialQuery }) => {
     { name: 'README.md', type: 'md' }
   ];
 
+  const agentReachFiles = [
+    { name: 'cli.py', type: 'py' },
+    { name: 'core.py', type: 'py' },
+    { name: 'config.py', type: 'py' },
+    { name: 'doctor.py', type: 'py' },
+    { name: 'probe.py', type: 'py' },
+    { name: 'cookie_extract.py', type: 'py' },
+    { name: 'README.md', type: 'md' }
+  ];
+
   const codeSnippets = {
+    'cli.py': `# Agent-Reach CLI Lead Scraper & Outreach Module
+import click
+import json
+from agent_reach.core import discover_no_website_leads
+
+@click.group()
+def cli():
+    """Agent-Reach CLI: Automated Lead Discovery for Businesses Without Websites"""
+    pass
+
+@cli.command()
+@click.option('--city', default='Indore', help='Target city location')
+@click.option('--category', default='Restaurant', help='Target business niche')
+def search(city, category):
+    click.echo(f"[*] Scanning {city} for {category} prospects without websites...")
+    leads = discover_no_website_leads(city, category)
+    click.echo(json.dumps(leads, indent=2))
+
+if __name__ == '__main__':
+    cli()`,
+
+    'core.py': `# Agent-Reach Core Lead Extractor Engine
+import requests
+
+def discover_no_website_leads(city, category):
+    """Deep searches Google Maps & Local Registers for businesses lacking websites"""
+    leads = [
+        {
+            "name": f"{category} Royal Center of {city}",
+            "website": None,
+            "status": "❌ No Website (High Opportunity)",
+            "google_maps": f"https://maps.google.com/?q={category}+{city}"
+        }
+    ]
+    return leads`,
+
+    'config.py': `# Agent-Reach Configuration Module
+import os
+
+AGENT_REACH_API_KEY = os.getenv("VITE_API_KEY", "YOUR_AGENT_REACH_API_KEY")
+GOOGLE_MAPS_ENABLED = True
+TARGET_REV_MIN = "$600K"
+TARGET_REV_MAX = "$2.8M"`,
+
+    'doctor.py': `# Agent-Reach Diagnostic Probe Module
+def run_preflight_checks():
+    print("[✓] Agent-Reach CLI environment healthy.")
+    print("[✓] Google Maps API endpoint reachable.")
+    print("[✓] No-Website Lead Scraper active.")`,
+
+    'probe.py': `# Agent-Reach Live Network Probe Module
+import sys
+
+def probe_network_health():
+    print("[Probe] Agent-Reach proxy network operating cleanly.")`,
+
+    'cookie_extract.py': `# Agent-Reach Session Cookie Extractor Module
+def extract_auth_cookies():
+    return {"session_active": True}`,
+
     'index.html': `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -70,6 +141,7 @@ export const CodeStudioView = ({ initialQuery }) => {
   <script type="module" src="/App.jsx"></script>
 </body>
 </html>`,
+
     'App.jsx': `import React from 'react';
 import { HeroSection } from './HeroSection';
 import { LeadCaptureForm } from './LeadCaptureForm';
@@ -82,58 +154,7 @@ export default function App() {
     </main>
   );
 }`,
-    'HeroSection.jsx': `import React from 'react';
 
-export const HeroSection = () => {
-  return (
-    <section className="py-20 px-8 max-w-5xl mx-auto text-center">
-      <h1 className="text-5xl font-bold tracking-tight text-white mb-6">
-        High-Converting Cloned Website Engine
-      </h1>
-      <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-        Automated website downloader & clone showcase with real-time lead capture integration.
-      </p>
-    </section>
-  );
-};`,
-    'LeadCaptureForm.jsx': `import React, { useState } from 'react';
-
-export const LeadCaptureForm = () => {
-  const [email, setEmail] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    alert('Lead captured successfully!');
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="flex gap-3 max-w-md mx-auto">
-      <input 
-        type="email" 
-        placeholder="Enter business email..." 
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 text-white flex-1"
-      />
-      <button type="submit" className="px-6 py-3 rounded-lg bg-green-500 text-black font-semibold">
-        Submit Lead
-      </button>
-    </form>
-  );
-};`,
-    'styles.css': `/* Website Cloner Custom CSS Rules */
-body {
-  margin: 0;
-  padding: 0;
-  background-color: #040605;
-  color: #ffffff;
-  font-family: 'Schibsted Grotesk', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-
-.hero-gradient {
-  background: linear-gradient(135deg, rgba(48,209,88,0.15) 0%, rgba(10,132,255,0.15) 100%);
-}`,
     'downloader.py': `# Complete Website Downloader Engine
 import urllib.request
 import os
@@ -141,34 +162,23 @@ import os
 def download_site_assets(url, output_dir):
     print(f"[*] Downloading website structure from {url} to {output_dir}...")
     os.makedirs(output_dir, exist_ok=True)
-    # Asset extraction & local mirror saving logic
-    print("[✓] Website assets successfully mirrored.")
+    print("[✓] Website assets successfully mirrored.")`,
 
-if __name__ == "__main__":
-    download_site_assets("https://example-lead-target.com", "./downloads")`,
     'site_cloner.js': `// Site Cloner Module — Complete Asset Extractor
 import fs from 'fs';
-import path from 'path';
 
 export async function cloneWebsiteStructure(targetUrl) {
   console.log(\`[Cloner] Processing \${targetUrl}...\`);
-  // Mirror DOM, CSS styles, and asset images
   return { status: 200, assetsExtracted: 48 };
 }`,
-    'asset_extractor.js': `// Asset Extractor Script
-export function extractImagesAndFonts(htmlString) {
-  const imageRegex = /<img[^>]+src="([^">]+)"/g;
-  const matches = [...htmlString.matchAll(imageRegex)];
-  return matches.map(m => m[1]);
-}`,
-    'README.md': `# Complete Website Downloader & Cloner Workspace
 
-This workspace contains automated website downloading, asset extraction, and JSX clone rendering modules.
+    'README.md': `# Agent-Reach-main & Website Downloader Workspace
 
-## Features Included
-- HTML5 / React JSX Clone Mirror
-- Automated CSS & Media Asset Extractor
-- Deep Python & Node.js Downloader Scripts
+This workspace integrates the Agent-Reach python lead scraper engine with automated website downloading, asset extraction, and React JSX clone rendering.
+
+## Modules Included
+- Agent-Reach CLI (cli.py, core.py, config.py)
+- Website Cloner & Downloader (downloader.py, site_cloner.js)
 `
   };
 
@@ -310,12 +320,12 @@ This workspace contains automated website downloading, asset extraction, and JSX
         <div style={{ width: '100%', maxWidth: isPaneVisible ? (isMobileMode ? '728px' : '100%') : '728px', margin: isPaneVisible ? '0' : '0 auto' }}>
           <SearchInputBox 
             onSubmit={handleSendFollowUp} 
-            placeholder="Write code or clone command..." 
+            placeholder="Write code or Agent-Reach command..." 
           />
         </div>
       </div>
 
-      {/* Right Column: Code Studio & Website Cloner Workspace */}
+      {/* Right Column: Code Studio & Agent-Reach Workspace */}
       <div
         style={{
           flex: isPaneVisible ? (panelTabMode === 'code' ? 1 : (isMobileMode ? 'none' : 1)) : 0,
@@ -438,7 +448,7 @@ This workspace contains automated website downloading, asset extraction, and JSX
           </div>
         </div>
 
-        {/* Panel Main Area: Code View with 2 Integrated Folders */}
+        {/* Panel Main Area: Code View with 3 Integrated Folders */}
         {panelTabMode === 'code' ? (
           <div
             style={{
@@ -468,6 +478,60 @@ This workspace contains automated website downloading, asset extraction, and JSX
             >
               <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
                 EXPLORER
+              </div>
+
+              {/* FOLDER 3: Agent-Reach-main (PRIMARY REPO) */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div
+                  onClick={() => setFolder3Open(!folder3Open)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: '#FF9F0A',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    padding: '6px 8px',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(255, 159, 10, 0.12)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title="Agent-Reach-main"
+                >
+                  <span style={{ fontSize: '10px', transition: 'transform 0.15s ease', transform: folder3Open ? 'rotate(90deg)' : 'none' }}>▶</span>
+                  <span>📁 Agent-Reach-main</span>
+                </div>
+
+                {folder3Open && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '14px', marginTop: '2px' }}>
+                    {agentReachFiles.map((f, idx) => {
+                      const isSelected = selectedFile === f.name;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setSelectedFile(f.name)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '5px 8px',
+                            borderRadius: '6px',
+                            backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
+                            color: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                            cursor: 'pointer',
+                            fontWeight: isSelected ? 600 : 400,
+                            fontSize: '11.5px'
+                          }}
+                        >
+                          <span style={{ fontSize: '12px', color: '#FF9F0A' }}>📄</span>
+                          <span>{f.name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
 
               {/* FOLDER 1: clone_of_the_website_shown_in_the_image_otmtyq */}
@@ -598,8 +662,8 @@ This workspace contains automated website downloading, asset extraction, and JSX
                   <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#ffffff', fontFamily: 'monospace' }}>
                     {selectedFile}
                   </span>
-                  <span style={{ fontSize: '10.5px', color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.15)', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
-                    Active Clone Module
+                  <span style={{ fontSize: '10.5px', color: '#FF9F0A', backgroundColor: 'rgba(255, 159, 10, 0.15)', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
+                    Agent-Reach Active Engine
                   </span>
                 </div>
 
