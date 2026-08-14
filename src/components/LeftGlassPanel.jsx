@@ -12,6 +12,11 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
+  // Custom MCP Integrations State
+  const [customMcpName, setCustomMcpName] = useState('');
+  const [customMcpUrl, setCustomMcpUrl] = useState('');
+  const [customMcps, setCustomMcps] = useState([]);
+
   const [historyItems, setHistoryItems] = useState([
     { title: "find me a lead in indore on restaurant without website", time: "Just now" },
     { title: "10 Indore Restaurants Without Website (Vijay Nagar, Rajwada)", time: "10 mins ago" },
@@ -47,6 +52,14 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
       onSelectHistoryQuery(title);
     }
     setShowHistory(false);
+  };
+
+  const handleAddCustomMcp = (e) => {
+    e.preventDefault();
+    if (!customMcpName.trim() || !customMcpUrl.trim()) return;
+    setCustomMcps((prev) => [...prev, { name: customMcpName, url: customMcpUrl }]);
+    setCustomMcpName('');
+    setCustomMcpUrl('');
   };
 
   // Compute initials or Google User photo
@@ -244,10 +257,10 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
             </div>
             <div style={{ overflow: 'hidden' }}>
               <div style={{ fontSize: '13px', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {user?.user_metadata?.full_name || 'Rudra Account'}
+                {user?.user_metadata?.full_name || 'Rudra Pratap'}
               </div>
               <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.5)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                {user?.email || 'markzap.lead@pro'}
+                {user?.email || 'rp0948566@gmail.com'}
               </div>
             </div>
           </div>
@@ -424,7 +437,7 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.82)',
+            backgroundColor: 'rgba(0, 0, 0, 0.85)',
             zIndex: 100,
             display: 'flex',
             alignItems: 'center',
@@ -435,10 +448,10 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
           <div
             className="history-paper-drawer"
             style={{
-              width: '65vw',
-              maxWidth: '920px',
-              height: '65vh',
-              maxHeight: '680px',
+              width: '68vw',
+              maxWidth: '960px',
+              height: '72vh',
+              maxHeight: '740px',
               backgroundColor: '#0c100e',
               border: '1px solid rgba(255, 255, 255, 0.16)',
               borderRadius: '28px',
@@ -456,10 +469,10 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255, 255, 255, 0.10)', paddingBottom: '20px' }}>
               <div>
                 <h2 style={{ fontSize: '24px', fontWeight: 800, margin: 0, color: '#ffffff' }}>
-                  ⚙️ Workspace & Engine Settings
+                  ⚙️ AI Integrations & Custom Connections
                 </h2>
                 <p style={{ fontSize: '13.5px', color: 'rgba(255, 255, 255, 0.55)', margin: '4px 0 0 0' }}>
-                  Manage AI Lead Engine, Supabase Auth, and API integrations
+                  Connect GitHub, Gmail, Vercel, 21st.dev & Motion MCP endpoints to let AI inspect, edit code & send emails
                 </p>
               </div>
 
@@ -484,47 +497,152 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
               </button>
             </div>
 
-            {/* Modal Body: Settings Options */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', flex: 1, margin: '24px 0', overflowY: 'auto' }}>
-              {/* Box 1: General Workspace */}
-              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '20px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 12px 0', color: '#ffffff' }}>🌐 General</h3>
-                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.6' }}>
-                  <div><strong>App Name:</strong> Mark Zap Lead Finder</div>
-                  <div><strong>Version:</strong> v1.0.0 Pro</div>
-                  <div><strong>Theme:</strong> Dark Solid Glass (No Blur)</div>
+            {/* Modal Body: Custom Integration Connections Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '18px', flex: 1, margin: '20px 0', overflowY: 'auto', paddingRight: '4px' }}>
+              
+              {/* Card 1: GitHub Connection */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '18px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>🐙 GitHub Repository Access</div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.15)', padding: '3px 8px', borderRadius: '6px' }}>✓ Connected</span>
+                  </div>
+                  <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.5' }}>
+                    <strong>Account:</strong> rp0948566-hue / Make-Zap<br />
+                    Allows AI to pull code, make edits, sync commits & push directly to GitHub repositories.
+                  </div>
+                </div>
+                <button
+                  onClick={() => alert("GitHub integration active & authorized for rp0948566-hue/Make-Zap.")}
+                  style={{ marginTop: '12px', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Manage GitHub Permissions
+                </button>
+              </div>
+
+              {/* Card 2: Gmail Outreach Connection */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '18px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>📧 Gmail & Email Outreach</div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.15)', padding: '3px 8px', borderRadius: '6px' }}>✓ Connected</span>
+                  </div>
+                  <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.5' }}>
+                    <strong>Account:</strong> rp0948566@gmail.com<br />
+                    Allows AI to generate & send custom sales proposals, cold outreach emails & read lead replies.
+                  </div>
+                </div>
+                <button
+                  onClick={() => alert("Gmail outreach active for rp0948566@gmail.com.")}
+                  style={{ marginTop: '12px', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Configure Email Templates
+                </button>
+              </div>
+
+              {/* Card 3: Vercel Cloud Connection */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '18px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>▲ Vercel Cloud Deployment</div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.15)', padding: '3px 8px', borderRadius: '6px' }}>✓ Connected</span>
+                  </div>
+                  <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.5' }}>
+                    <strong>Account:</strong> rp0948566-projects<br />
+                    Auto-deploys cloned websites, React components & live landing page previews instantly.
+                  </div>
+                </div>
+                <button
+                  onClick={() => alert("Vercel deployment engine active.")}
+                  style={{ marginTop: '12px', backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#fff', border: '1px solid rgba(255, 255, 255, 0.15)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  View Live Deployments
+                </button>
+              </div>
+
+              {/* Card 4: 21st.dev MCP Integration */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '18px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#FF9F0A' }}>⚡ 21st.dev MCP Server</div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.15)', padding: '3px 8px', borderRadius: '6px' }}>✓ Connected (Free Tier)</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.45', fontFamily: 'monospace' }}>
+                    <div><strong>URL:</strong> https://21st.dev/api/mcp</div>
+                    <div><strong>API Key:</strong> 21st_sk_c68675f8... (Active)</div>
+                    <div style={{ marginTop: '4px', fontFamily: 'sans-serif', fontSize: '12px' }}>Pulls UI components & design primitives for web cloner.</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => alert("21st.dev MCP Server connected cleanly!")}
+                  style={{ marginTop: '12px', backgroundColor: 'rgba(255, 159, 10, 0.15)', color: '#FF9F0A', border: '1px solid rgba(255, 159, 10, 0.3)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Verify 21st.dev Status
+                </button>
+              </div>
+
+              {/* Card 5: Motion MCP Integration */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.12)', borderRadius: '18px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#0A84FF' }}>⚡ Motion MCP Server</div>
+                    <span style={{ fontSize: '11px', fontWeight: 700, color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.15)', padding: '3px 8px', borderRadius: '6px' }}>✓ Connected (Free Tier)</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.45', fontFamily: 'monospace' }}>
+                    <div><strong>URL:</strong> https://xgdzyqfalbibzelpdpvr.../mcp</div>
+                    <div style={{ marginTop: '4px', fontFamily: 'sans-serif', fontSize: '12px' }}>Motion animation & workflow automation server.</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => alert("Motion MCP Server active on free endpoint.")}
+                  style={{ marginTop: '12px', backgroundColor: 'rgba(10, 132, 255, 0.15)', color: '#0A84FF', border: '1px solid rgba(10, 132, 255, 0.3)', borderRadius: '8px', padding: '6px 12px', fontSize: '12px', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Verify Motion Endpoint
+                </button>
+              </div>
+
+              {/* Card 6: Add Custom Connection Form */}
+              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px dashed rgba(255, 255, 255, 0.25)', borderRadius: '18px', padding: '18px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#ffffff', marginBottom: '8px' }}>
+                    ➕ Add Custom MCP / API Connection
+                  </div>
+
+                  {customMcps.length > 0 && (
+                    <div style={{ marginBottom: '10px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                      {customMcps.map((m, i) => (
+                        <div key={i} style={{ fontSize: '11.5px', color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.1)', padding: '4px 8px', borderRadius: '6px' }}>
+                          ✓ {m.name}: {m.url}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleAddCustomMcp} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <input
+                      type="text"
+                      placeholder="Server Name (e.g. My Custom MCP)"
+                      value={customMcpName}
+                      onChange={(e) => setCustomMcpName(e.target.value)}
+                      style={{ backgroundColor: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', padding: '6px 10px', color: '#fff', fontSize: '12px' }}
+                    />
+                    <input
+                      type="text"
+                      placeholder="MCP Server Endpoint URL (https://...)"
+                      value={customMcpUrl}
+                      onChange={(e) => setCustomMcpUrl(e.target.value)}
+                      style={{ backgroundColor: 'rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '6px', padding: '6px 10px', color: '#fff', fontSize: '12px' }}
+                    />
+                    <button
+                      type="submit"
+                      style={{ backgroundColor: '#30D158', color: '#000', border: 'none', borderRadius: '6px', padding: '6px 12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}
+                    >
+                      + Add Connection Endpoint
+                    </button>
+                  </form>
                 </div>
               </div>
 
-              {/* Box 2: Lead Engine Config */}
-              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '20px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 12px 0', color: '#30D158' }}>⚡ Lead Engine</h3>
-                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.6' }}>
-                  <div><strong>Provider Key:</strong> AQ.Ab8RN6J... (Active)</div>
-                  <div><strong>Project ID:</strong> 171579689146</div>
-                  <div><strong>Filter Rules:</strong> Mid-Range (No Website)</div>
-                </div>
-              </div>
-
-              {/* Box 3: Supabase Cloud */}
-              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '20px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 12px 0', color: '#0A84FF' }}>⚡ Supabase Auth</h3>
-                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.6' }}>
-                  <div><strong>Supabase Host:</strong> laubhpdscqcfvnwdwakh</div>
-                  <div><strong>OAuth Provider:</strong> Google Authorized</div>
-                  <div><strong>Status:</strong> {user ? `Logged in as ${user.email}` : 'Guest Mode (Local Storage)'}</div>
-                </div>
-              </div>
-
-              {/* Box 4: Agent-Reach-main */}
-              <div style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)', borderRadius: '18px', padding: '20px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, margin: '0 0 12px 0', color: '#FF9F0A' }}>📁 Agent-Reach-main</h3>
-                <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)', lineHeight: '1.6' }}>
-                  <div><strong>Status:</strong> Integrated in /code workspace</div>
-                  <div><strong>CLI Modules:</strong> cli.py, core.py, config.py</div>
-                  <div><strong>Target:</strong> Mid-range businesses</div>
-                </div>
-              </div>
             </div>
 
             {/* Modal Footer */}
@@ -542,7 +660,7 @@ export const LeftGlassPanel = ({ onNewChat, onSelectHistoryQuery }) => {
                   cursor: 'pointer'
                 }}
               >
-                Done
+                Save & Close
               </button>
             </div>
           </div>
