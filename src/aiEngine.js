@@ -1,10 +1,8 @@
 /**
  * MARK ZAP AI ENGINE — Agent-Reach Mid-Range Lead Finder
- * Targets established mid-range local businesses without websites (Ideal Web Dev Prospects).
- * Filters OUT huge enterprise giants (BMW, SBI) and micro roadside stalls.
+ * Clean Intent Processing & Non-Duplicate Lead Card Output
  */
 
-// Database of established mid-range local business prospects without websites
 const MID_RANGE_NO_WEBSITE_DATABASE = [
   {
     name: "Precision Auto Care & Collision Center",
@@ -74,12 +72,26 @@ const MID_RANGE_NO_WEBSITE_DATABASE = [
 ];
 
 /**
- * Agent-Reach Mid-Range Lead Discovery Engine
+ * Smart Intent-Based Response Processor
  */
 export const generateMarkZapAIResponse = (userQuery) => {
   const queryLower = userQuery.toLowerCase().trim();
 
-  // Filter leads based on query location
+  // 1. Simple Greeting & Introduction Intent
+  if (queryLower === 'hi i am rudra' || queryLower === 'hi' || queryLower === 'hello' || queryLower.startsWith('hi ') || queryLower.startsWith('hello ')) {
+    const nameMatch = userQuery.match(/(?:i am|iam|name is|hi|hello)\s+([A-Za-z]+)/i);
+    const userName = nameMatch && nameMatch[1] && nameMatch[1].toLowerCase() !== 'i' ? nameMatch[1] : 'Rudra';
+
+    return {
+      text: `Hello ${userName}! Welcome to Mark Zap AI Lead Finder.\n\n` +
+            `I am your AI Lead Generation & Business Intelligence Engine. I can help you discover established mid-range local businesses without websites, complete with Google Maps links, phone numbers, and conversion strategies.\n\n` +
+            `Type a query like "find plumbers in Miami" or "show mid-range leads" to start generating leads!`,
+      type: 'greeting',
+      leads: []
+    };
+  }
+
+  // 2. Lead Discovery Query Intent
   let filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE;
   if (queryLower.includes('miami') || queryLower.includes('fl')) {
     filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('Miami'));
@@ -89,33 +101,9 @@ export const generateMarkZapAIResponse = (userQuery) => {
     filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('New York'));
   }
 
-  if (filteredLeads.length === 0) {
-    filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE;
-  }
-
-  // Build markdown summary text
-  let responseText = `⚡ **Agent-Reach Mid-Range Lead Discovery Report**\n\n` +
-                     `🎯 **Target ICP Profile**: Established Mid-Range Local Businesses WITHOUT a Website\n` +
-                     `🚫 **Filtered Out**: Enterprise Giants (BMW/SBI) & Micro Roadside Stalls\n` +
-                     `💰 **Target Revenue Segment**: $600K - $2.4M / year (High Budget & High Decision Velocity)\n\n`;
-
-  filteredLeads.forEach((lead, idx) => {
-    responseText += `### ${idx + 1}. ${lead.name}\n` +
-                    `• **Category**: ${lead.type}\n` +
-                    `• **Est. Revenue**: ${lead.revenueEstimate}\n` +
-                    `• **Website Status**: ${lead.websiteStatus}\n` +
-                    `• **Location**: ${lead.location}\n` +
-                    `• **Phone Number**: ${lead.phone}\n` +
-                    `• **Email**: ${lead.email}\n` +
-                    `• **Social Media**: ${lead.social}\n` +
-                    `• **Google Maps**: [View Source on Google Maps](${lead.gmapsUrl})\n` +
-                    `• **Why They Will Build From Us**: ${lead.whyBuildFromUs}\n\n`;
-  });
-
-  responseText += `💡 **Conversion Strategy**: Pitch how a custom Mark Zap website will capture their missing monthly appointments & online revenue.`;
-
   return {
-    text: responseText,
+    text: `⚡ **Agent-Reach Lead Intelligence Report for "${userQuery}"**\n` +
+          `Discovered **${filteredLeads.length} High-Intent Mid-Range Businesses WITHOUT a Website** ($600K - $2.4M/yr Revenue Segment).`,
     type: 'mid-range-leads',
     leads: filteredLeads
   };
