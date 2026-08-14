@@ -31,9 +31,16 @@ export const LeftGlassPanel = ({ onNewChat }) => {
     }
   }, [user]);
 
-  // Compute initials or Google User photo
-  const userInitial = user?.user_metadata?.full_name ? user.user_metadata.full_name[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : 'R');
-  const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
+  // Compute initials or Google User photo from all possible metadata paths
+  const userInitial = user?.user_metadata?.full_name 
+    ? user.user_metadata.full_name[0].toUpperCase() 
+    : (user?.email ? user.email[0].toUpperCase() : 'R');
+
+  const userAvatar = 
+    user?.user_metadata?.avatar_url || 
+    user?.user_metadata?.picture || 
+    user?.identities?.[0]?.identity_data?.avatar_url ||
+    user?.identities?.[0]?.identity_data?.picture;
 
   return (
     <>
@@ -154,7 +161,12 @@ export const LeftGlassPanel = ({ onNewChat }) => {
             }}
           >
             {userAvatar ? (
-              <img src={userAvatar} alt="Google Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img 
+                src={userAvatar} 
+                alt={user?.user_metadata?.full_name || "Google Profile"} 
+                referrerPolicy="no-referrer"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+              />
             ) : (
               <div
                 style={{
