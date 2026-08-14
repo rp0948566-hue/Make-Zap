@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { AISparkleIcon, UpArrowIcon, PaperclipIcon, WaveformVoiceIcon, SearchIcon, CodeIcon } from './Icons';
+import React, { useState, useRef } from 'react';
+import { AISparkleIcon, UpArrowIcon, PaperclipIcon, SearchIcon, CodeIcon } from './Icons';
 
 export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) => {
   const [text, setText] = useState('');
@@ -190,7 +190,7 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) =>
           </button>
         </div>
 
-        {/* Bottom portion inside white card: Action Links + Character Count */}
+        {/* Bottom portion inside white card: Attach Action Button */}
         <div 
           style={{
             display: 'flex',
@@ -200,38 +200,12 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) =>
             userSelect: 'none'
           }}
         >
-          {/* Left Action Buttons */}
+          {/* Left Action Button */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
             <button className="white-card-action">
               <PaperclipIcon />
               <span>Attach</span>
             </button>
-            <button className="white-card-action">
-              <WaveformVoiceIcon />
-              <span>Voice</span>
-            </button>
-            <button 
-              className="white-card-action"
-              onClick={() => {
-                setText('/code ');
-                if (textareaRef.current) textareaRef.current.focus();
-              }}
-            >
-              <SearchIcon />
-              <span>Prompts</span>
-            </button>
-          </div>
-
-          {/* Right Character Counter */}
-          <div 
-            style={{
-              fontFamily: "'Schibsted Grotesk', sans-serif",
-              fontSize: '12px',
-              color: '#8e8e93',
-              fontWeight: 400
-            }}
-          >
-            {text.length}/3,000
           </div>
         </div>
       </div>

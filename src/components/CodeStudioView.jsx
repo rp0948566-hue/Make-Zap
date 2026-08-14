@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SearchInputBox } from './SearchInputBox';
 import { CodeIcon } from './Icons';
+import { useAuth } from '../AuthContext';
+import { saveChatToSupabase } from '../chatService';
 
 export const CodeStudioView = ({ initialQuery }) => {
+  const { user } = useAuth();
   const [messages, setMessages] = useState([
     { id: 1, sender: 'user', text: initialQuery },
     { 
@@ -14,6 +17,13 @@ export const CodeStudioView = ({ initialQuery }) => {
   const [deviceMode, setDeviceMode] = useState('mobile'); // 'mobile' | 'desktop'
   const [panelTabMode, setPanelTabMode] = useState('preview'); // 'preview' | 'code'
   const [isPaneVisible, setIsPaneVisible] = useState(true);
+
+  // Sync session to Supabase
+  useEffect(() => {
+    if (initialQuery && messages.length > 0) {
+      saveChatToSupabase(user?.id, initialQuery, messages);
+    }
+  }, [messages, user, initialQuery]);
 
   const handleSendFollowUp = (queryText) => {
     if (!queryText.trim()) return;
@@ -172,7 +182,7 @@ export const CodeStudioView = ({ initialQuery }) => {
         </div>
       </div>
 
-      {/* Right Column: Increased Phone Panel Width (480px in Phone Mode) */}
+      {/* Right Column: Increased Phone Panel Width */}
       <div
         style={{
           flex: isPaneVisible ? (panelTabMode === 'code' ? 1 : (isMobileMode ? 'none' : 1)) : 0,
@@ -190,7 +200,7 @@ export const CodeStudioView = ({ initialQuery }) => {
           transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
         }}
       >
-        {/* Right Panel Control Header Bar with Preview/Code Tabs + Device Switcher */}
+        {/* Control Header Bar */}
         <div
           style={{
             height: '52px',
@@ -203,7 +213,7 @@ export const CodeStudioView = ({ initialQuery }) => {
             boxSizing: 'border-box'
           }}
         >
-          {/* Main Tab Switchers: Preview vs Code */}
+          {/* Main Tab Switchers */}
           <div style={{ display: 'flex', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '2px', gap: '2px' }}>
             <button
               onClick={() => setPanelTabMode('preview')}
@@ -239,7 +249,7 @@ export const CodeStudioView = ({ initialQuery }) => {
             </button>
           </div>
 
-          {/* Right Sub-Controls: Phone & Desktop Device Toggle + Hide Pane */}
+          {/* Sub-Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             {panelTabMode === 'preview' && (
               <div style={{ display: 'flex', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '2px', gap: '2px' }}>
@@ -298,9 +308,9 @@ export const CodeStudioView = ({ initialQuery }) => {
           </div>
         </div>
 
-        {/* Panel Main Area: Code View OR Pure OLED Display Mode */}
+        {/* Panel Main Area */}
         {panelTabMode === 'code' ? (
-          /* CLEAN EMPTY CODE VIEW STRUCTURE */
+          /* CODE VIEW */
           <div
             style={{
               flex: 1,
@@ -310,7 +320,6 @@ export const CodeStudioView = ({ initialQuery }) => {
               backgroundColor: '#070908'
             }}
           >
-            {/* File Explorer Tree Sidebar */}
             <div
               style={{
                 width: '180px',
@@ -330,7 +339,6 @@ export const CodeStudioView = ({ initialQuery }) => {
               </div>
             </div>
 
-            {/* Clean Empty Code Canvas Structure */}
             <div
               style={{
                 flex: 1,
@@ -364,7 +372,7 @@ export const CodeStudioView = ({ initialQuery }) => {
             </div>
           </div>
         ) : (
-          /* PREVIEW DISPLAY MODE: ULTRA-REALISTIC HARDWARE CHASSIS BODY (PURE BLACK INSIDE) */
+          /* PREVIEW MODE */
           <div
             style={{
               flex: 1,
@@ -378,7 +386,7 @@ export const CodeStudioView = ({ initialQuery }) => {
             }}
           >
             {isMobileMode ? (
-              /* HYPER-REALISTIC 3D PHYSICAL SMARTPHONE HARDWARE CHASSIS */
+              /* SMARTPHONE FRAME */
               <div
                 style={{
                   position: 'relative',
@@ -388,90 +396,13 @@ export const CodeStudioView = ({ initialQuery }) => {
                   transition: 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
                 }}
               >
-                {/* 3D Extruded Mute / Ring Switch */}
-                <div 
-                  style={{ 
-                    position: 'absolute', 
-                    left: '-8px', 
-                    top: '85px', 
-                    width: '6px', 
-                    height: '24px', 
-                    background: 'linear-gradient(180deg, #48544c 0%, #1e2520 100%)', 
-                    borderRadius: '4px 0 0 4px',
-                    boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), -4px 2px 8px rgba(0,0,0,0.9)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }} 
-                >
+                <div style={{ position: 'absolute', left: '-8px', top: '85px', width: '6px', height: '24px', background: 'linear-gradient(180deg, #48544c 0%, #1e2520 100%)', borderRadius: '4px 0 0 4px', boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.5), -4px 2px 8px rgba(0,0,0,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <div style={{ width: '2px', height: '8px', backgroundColor: '#ff453a', borderRadius: '1px', boxShadow: '0 0 4px #ff453a' }} />
                 </div>
+                <div style={{ position: 'absolute', left: '-8px', top: '135px', width: '6px', height: '52px', background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', borderRadius: '4px 0 0 4px', boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), -4px 3px 8px rgba(0,0,0,0.95)' }} />
+                <div style={{ position: 'absolute', left: '-8px', top: '202px', width: '6px', height: '52px', background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', borderRadius: '4px 0 0 4px', boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), -4px 3px 8px rgba(0,0,0,0.95)' }} />
+                <div style={{ position: 'absolute', right: '-8px', top: '150px', width: '6px', height: '74px', background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', borderRadius: '0 4px 4px 0', boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), 4px 3px 8px rgba(0,0,0,0.95)' }} />
 
-                {/* 3D Extruded Volume Up Button */}
-                <div 
-                  style={{ 
-                    position: 'absolute', 
-                    left: '-8px', 
-                    top: '135px', 
-                    width: '6px', 
-                    height: '52px', 
-                    background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', 
-                    borderRadius: '4px 0 0 4px',
-                    boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), -4px 3px 8px rgba(0,0,0,0.95)' 
-                  }} 
-                />
-
-                {/* 3D Extruded Volume Down Button */}
-                <div 
-                  style={{ 
-                    position: 'absolute', 
-                    left: '-8px', 
-                    top: '202px', 
-                    width: '6px', 
-                    height: '52px', 
-                    background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', 
-                    borderRadius: '4px 0 0 4px',
-                    boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), -4px 3px 8px rgba(0,0,0,0.95)' 
-                  }} 
-                />
-
-                {/* 3D Extruded Power / Lock Key */}
-                <div 
-                  style={{ 
-                    position: 'absolute', 
-                    right: '-8px', 
-                    top: '150px', 
-                    width: '6px', 
-                    height: '74px', 
-                    background: 'linear-gradient(180deg, #505d54 0%, #202722 100%)', 
-                    borderRadius: '0 4px 4px 0',
-                    boxShadow: 'inset 0 1.5px 2px rgba(255,255,255,0.5), 4px 3px 8px rgba(0,0,0,0.95)' 
-                  }} 
-                />
-
-                {/* SIM Card Tray Ejection Slot */}
-                <div 
-                  style={{ 
-                    position: 'absolute', 
-                    right: '-2px', 
-                    top: '280px', 
-                    width: '3px', 
-                    height: '32px', 
-                    backgroundColor: '#161c18', 
-                    borderRadius: '0 2px 2px 0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                  }} 
-                >
-                  <div style={{ width: '1.5px', height: '3px', backgroundColor: '#090d10', borderRadius: '50%' }} />
-                </div>
-
-                {/* Antenna Band Cutouts */}
-                <div style={{ position: 'absolute', top: '50px', left: '-10px', width: '4px', height: '5px', backgroundColor: '#111613' }} />
-                <div style={{ position: 'absolute', top: '50px', right: '-10px', width: '4px', height: '5px', backgroundColor: '#111613' }} />
-
-                {/* Main Physical Phone Outer Frame & Curved OLED Screen Container */}
                 <div
                   style={{
                     width: '100%',
@@ -480,7 +411,7 @@ export const CodeStudioView = ({ initialQuery }) => {
                     background: 'linear-gradient(145deg, #2b332d 0%, #151a17 40%, #0a0e0c 100%)',
                     border: '12px solid #1c221e',
                     borderRadius: '52px',
-                    boxShadow: '0 40px 100px rgba(0, 0, 0, 0.95), inset 0 0 0 2px rgba(255, 255, 255, 0.25), inset 0 0 14px rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 40px 100px rgba(0, 0, 0, 0.95), inset 0 0 0 2px rgba(255, 255, 255, 0.25)',
                     display: 'flex',
                     flexDirection: 'column',
                     position: 'relative',
@@ -488,7 +419,6 @@ export const CodeStudioView = ({ initialQuery }) => {
                     boxSizing: 'border-box'
                   }}
                 >
-                  {/* Curved Glass Lens Glossy Highlight Overlay */}
                   <div
                     style={{
                       position: 'absolute',
@@ -499,7 +429,6 @@ export const CodeStudioView = ({ initialQuery }) => {
                     }}
                   />
 
-                  {/* Top Dynamic Island Camera Notch & Sensors */}
                   <div
                     style={{
                       position: 'absolute',
@@ -514,48 +443,15 @@ export const CodeStudioView = ({ initialQuery }) => {
                       alignItems: 'center',
                       justifyContent: 'space-between',
                       padding: '0 12px',
-                      zIndex: 30,
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.9)'
+                      zIndex: 30
                     }}
                   >
-                    <div style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: '#090d10', border: '1px solid #1a221d', boxShadow: 'inset 0 0 2px #30D158' }} />
+                    <div style={{ width: '9px', height: '9px', borderRadius: '50%', backgroundColor: '#090d10', border: '1px solid #1a221d' }} />
                     <div style={{ width: '5px', height: '5px', borderRadius: '50%', backgroundColor: '#090d10' }} />
                   </div>
 
-                  {/* PURE CLEAN OLED BLACK SCREEN CANVAS */}
                   <div style={{ flex: 1, backgroundColor: '#000000' }} />
 
-                  {/* Bottom USB-C Port & Speaker Grill Connectors */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      bottom: '2px',
-                      left: 0,
-                      right: 0,
-                      height: '8px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '12px',
-                      zIndex: 20
-                    }}
-                  >
-                    <div style={{ display: 'flex', gap: '3px' }}>
-                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
-                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
-                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
-                    </div>
-
-                    <div style={{ width: '18px', height: '3.5px', backgroundColor: '#111613', borderRadius: '2px', border: '0.5px solid rgba(255,255,255,0.1)' }} />
-
-                    <div style={{ display: 'flex', gap: '3px' }}>
-                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
-                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
-                      <div style={{ width: '2px', height: '2px', backgroundColor: '#111613', borderRadius: '50%' }} />
-                    </div>
-                  </div>
-
-                  {/* Bottom iOS Swipe Home Bar */}
                   <div
                     style={{
                       height: '20px',
@@ -569,12 +465,12 @@ export const CodeStudioView = ({ initialQuery }) => {
                       zIndex: 30
                     }}
                   >
-                    <div style={{ width: '130px', height: '4.5px', backgroundColor: 'rgba(255, 255, 255, 0.85)', borderRadius: '2.5px', boxShadow: '0 1px 3px rgba(0,0,0,0.8)' }} />
+                    <div style={{ width: '130px', height: '4.5px', backgroundColor: 'rgba(255, 255, 255, 0.85)', borderRadius: '2.5px' }} />
                   </div>
                 </div>
               </div>
             ) : (
-              /* HYPER-REALISTIC MACBOOK PRO 3D HARDWARE SHOWCASE DISPLAY (DESKTOP MODE) */
+              /* MACBOOK PRO FRAME */
               <div
                 style={{
                   position: 'relative',
@@ -588,7 +484,6 @@ export const CodeStudioView = ({ initialQuery }) => {
                   justifyContent: 'center'
                 }}
               >
-                {/* MacBook Pro Display Lid Frame */}
                 <div
                   style={{
                     width: '100%',
@@ -605,7 +500,6 @@ export const CodeStudioView = ({ initialQuery }) => {
                     boxSizing: 'border-box'
                   }}
                 >
-                  {/* Top Camera Notch */}
                   <div
                     style={{
                       position: 'absolute',
@@ -624,24 +518,11 @@ export const CodeStudioView = ({ initialQuery }) => {
                     }}
                   >
                     <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#0b100d', border: '1px solid #1a221d' }} />
-                    <div style={{ width: '3px', height: '3px', borderRadius: '50%', backgroundColor: '#30D158', boxShadow: '0 0 4px #30D158' }} />
+                    <div style={{ width: '3px', height: '3px', borderRadius: '50%', backgroundColor: '#30D158' }} />
                   </div>
 
-                  {/* Glass Reflection Glare Highlight */}
-                  <div
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.01) 35%, rgba(255,255,255,0) 60%)',
-                      pointerEvents: 'none',
-                      zIndex: 25
-                    }}
-                  />
-
-                  {/* PURE CLEAN MACBOOK DISPLAY SCREEN CANVAS */}
                   <div style={{ flex: 1, backgroundColor: '#000000' }} />
 
-                  {/* Bottom Screen Bezel */}
                   <div
                     style={{
                       height: '24px',
@@ -659,14 +540,13 @@ export const CodeStudioView = ({ initialQuery }) => {
                   </div>
                 </div>
 
-                {/* Lower Base Deck Lip */}
                 <div
                   style={{
                     width: '106%',
                     height: '18px',
                     background: 'linear-gradient(180deg, #242c26 0%, #121714 60%, #0a0d0b 100%)',
                     borderRadius: '2px 2px 14px 14px',
-                    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.9), inset 0 1px 1px rgba(255, 255, 255, 0.3)',
+                    boxShadow: '0 12px 30px rgba(0, 0, 0, 0.9)',
                     position: 'relative',
                     marginTop: '-2px',
                     display: 'flex',

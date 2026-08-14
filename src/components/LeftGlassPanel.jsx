@@ -1,19 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   PlusIcon, 
   HistoryIcon,
   DownloadIcon 
 } from './Icons';
+import { useAuth } from '../AuthContext';
+import { fetchUserChats } from '../chatService';
 
 export const LeftGlassPanel = ({ onNewChat }) => {
   const [showHistory, setShowHistory] = useState(false);
-
-  const historyItems = [
+  const [historyItems, setHistoryItems] = useState([
     { title: "Lead Generation Strategy Q3", time: "10 mins ago" },
     { title: "Sales Funnel Conversion Metrics", time: "2 hours ago" },
     { title: "Automated Email Sequences", time: "Yesterday" },
     { title: "Competitor Market Insights", time: "3 days ago" },
-  ];
+  ]);
+
+  const { user, signInWithGoogle, signOut } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      fetchUserChats(user.id).then(chats => {
+        if (chats && chats.length > 0) {
+          setHistoryItems(chats.map(c => ({
+            title: c.title,
+            time: new Date(c.updated_at || c.created_at).toLocaleDateString()
+          })));
+        }
+      });
+    }
+  }, [user]);
+
+  // Compute initials or Google User photo
+  const userInitial = user?.user_metadata?.full_name ? user.user_metadata.full_name[0].toUpperCase() : (user?.email ? user.email[0].toUpperCase() : 'R');
+  const userAvatar = user?.user_metadata?.avatar_url || user?.user_metadata?.picture;
 
   return (
     <>
@@ -93,7 +113,7 @@ export const LeftGlassPanel = ({ onNewChat }) => {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', width: '100%' }}>
           {/* Download Icon */}
           <button
-            title="Download"
+            title="Download App"
             aria-label="Download"
             style={{
               background: 'transparent',
@@ -112,9 +132,10 @@ export const LeftGlassPanel = ({ onNewChat }) => {
             <DownloadIcon />
           </button>
 
-          {/* Profile Badge */}
+          {/* Profile Badge (Connected to Google Auth) */}
           <div
-            title="Mark Zap Profile"
+            onClick={user ? signOut : signInWithGoogle}
+            title={user ? `Signed in as ${user.email} (Click to Sign Out)` : "Sign in with Google"}
             style={{
               width: '38px',
               height: '38px',
@@ -127,29 +148,35 @@ export const LeftGlassPanel = ({ onNewChat }) => {
               alignItems: 'center',
               justifyContent: 'center',
               cursor: 'pointer',
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)'
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+              overflow: 'hidden',
+              position: 'relative'
             }}
           >
-            <div
-              style={{
-                width: '30px',
-                height: '30px',
-                borderRadius: '50%',
-                backgroundColor: '#c4c6b8',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '13px',
-                fontWeight: 700
-              }}
-            >
-              R
-            </div>
+            {userAvatar ? (
+              <img src={userAvatar} alt="Google Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            ) : (
+              <div
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  borderRadius: '50%',
+                  backgroundColor: '#c4c6b8',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '13px',
+                  fontWeight: 700
+                }}
+              >
+                {userInitial}
+              </div>
+            )}
           </div>
         </div>
       </aside>
 
-      {/* Ultra-Smooth Origami Paper Folding History Pop-up Drawer */}
+      {/* History Pop-up Drawer */}
       {showHistory && (
         <div
           className="history-paper-drawer"

@@ -1,9 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useAuth } from '../AuthContext';
 
 const FALCON_VIDEO_URL = "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260813_052122_e77a27e6-17f1-4794-889b-3ceaa0e9e8cb.mp4";
 
 export const LoginModal = ({ onClose }) => {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState(null);
+
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, user } = useAuth();
+
   const stageRef = useRef(null);
   const cardRef = useRef(null);
   const cardInRef = useRef(null);
@@ -19,7 +27,7 @@ export const LoginModal = ({ onClose }) => {
     var mqLandscape = window.matchMedia('(min-width:700px) and (min-aspect-ratio:51/50)');
 
     function photoRatio(vw) {
-      if (vw >= 1280) return 1 - PANE_RATIO; // 0.571038
+      if (vw >= 1280) return 1 - PANE_RATIO;
       if (vw >= 1000) return 0.571038 - (1280 - vw) * (0.571038 - 0.42) / 280;
       if (vw >= 820) return 0.42 - (1000 - vw) * (0.42 - 0.36) / 180;
       return 0.36;
@@ -47,7 +55,6 @@ export const LoginModal = ({ onClose }) => {
         if (photoRef.current) photoRef.current.style.width = (pr * 100) + '%';
         if (paneRef.current) paneRef.current.style.left = (pr * 100) + '%';
 
-        // Card placement
         var cs = Math.min(paneW / PANE_W, vh / CONTENT_H);
         var gapL = 1 * cs, mT = 14 * cs, mB = 13 * cs, mR = 14 * cs;
         var cw = Math.max(CARD_W * cs, paneW - gapL - mR);
@@ -76,7 +83,6 @@ export const LoginModal = ({ onClose }) => {
     window.addEventListener('resize', layout);
     window.addEventListener('orientationchange', layout);
 
-    // Entrance Animation timeline
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && Element.prototype.animate) {
       const ease = 'cubic-bezier(.16,1,.3,1)';
       const softEase = 'cubic-bezier(.22,1,.36,1)';
@@ -110,6 +116,26 @@ export const LoginModal = ({ onClose }) => {
       document.body.classList.remove('land', 'tabport', 'stacked');
     };
   }, []);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setAuthError(null);
+
+    if (isRegisterMode) {
+      const { error } = await signUpWithEmail(email, password, fullName);
+      if (error) setAuthError(error.message);
+      else onClose();
+    } else {
+      const { error } = await signInWithEmail(email, password);
+      if (error) setAuthError(error.message);
+      else onClose();
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setAuthError(null);
+    await signInWithGoogle();
+  };
 
   return (
     <div 
@@ -153,7 +179,7 @@ export const LoginModal = ({ onClose }) => {
       </button>
 
       <div className="stage" ref={stageRef}>
-        {/* Left Video Media Panel (Badge and Headline Removed) */}
+        {/* Left Video Media Panel */}
         <section className="photo" ref={photoRef}>
           <video className="photo-img photo-img--tall" autoPlay muted loop playsInline preload="auto">
             <source src={FALCON_VIDEO_URL} type="video/mp4" />
@@ -164,7 +190,7 @@ export const LoginModal = ({ onClose }) => {
           <div className="scrim"></div>
         </section>
 
-        {/* Right Form Pane (Interactive Mode Switch) */}
+        {/* Right Form Pane */}
         <section className="pane" ref={paneRef}>
           <div className="card" id="signal-card" ref={cardRef}>
             <div className="card-in" id="cardIn" ref={cardInRef}>
@@ -179,12 +205,20 @@ export const LoginModal = ({ onClose }) => {
                 )}
               </p>
 
-              {/* Full Name Field (Registration Mode Only) */}
+              {authError && (
+                <div style={{ color: '#ea4335', fontSize: '13px', textAlign: 'center', margin: '10px 0', fontWeight: 600 }}>
+                  {authError}
+                </div>
+              )}
+
+              {/* Full Name Field */}
               {isRegisterMode && (
                 <div className="field" id="name" style={{ top: '170px', height: '52px', background: '#fafafa', border: '1.5px solid #acacae' }}>
                   <input 
                     type="text"
                     placeholder="Full Name"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
                     autoComplete="name"
                     aria-label="Full Name"
                   />
@@ -205,6 +239,8 @@ export const LoginModal = ({ onClose }) => {
                 <input 
                   type="email"
                   placeholder="Eg. johndoe@gmail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   autoComplete="email"
                   aria-label="Email address"
                 />
@@ -224,6 +260,8 @@ export const LoginModal = ({ onClose }) => {
                 <input 
                   type="password"
                   placeholder={isRegisterMode ? "Create Password" : "Password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   autoComplete={isRegisterMode ? "new-password" : "current-password"}
                   aria-label="Password"
                 />
@@ -233,6 +271,7 @@ export const LoginModal = ({ onClose }) => {
               <button 
                 type="button" 
                 id="loginBtn"
+                onClick={handleSubmit}
                 style={{
                   top: isRegisterMode ? '364px' : '366px',
                   height: isRegisterMode ? '58px' : '65.5px'
@@ -258,6 +297,7 @@ export const LoginModal = ({ onClose }) => {
               <button 
                 type="button" 
                 id="gBtn"
+                onClick={handleGoogleSignIn}
                 style={{
                   top: isRegisterMode ? '490px' : '535px',
                   height: isRegisterMode ? '54px' : '59.5px'
@@ -272,7 +312,7 @@ export const LoginModal = ({ onClose }) => {
                 <span>Sign in with Google</span>
               </button>
 
-              {/* Footer with working Start Free / Log In toggle link */}
+              {/* Footer */}
               <p 
                 id="bottom"
                 style={{ top: isRegisterMode ? '562px' : '611px' }}

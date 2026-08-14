@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SearchInputBox } from './SearchInputBox';
+import { useAuth } from '../AuthContext';
+import { saveChatToSupabase } from '../chatService';
 
 export const ChatView = ({ initialQuery }) => {
+  const { user } = useAuth();
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -16,6 +19,13 @@ export const ChatView = ({ initialQuery }) => {
         : ''
     }
   ]);
+
+  // Automatically sync chat to Supabase database when updated
+  useEffect(() => {
+    if (initialQuery && messages.length > 0) {
+      saveChatToSupabase(user?.id, initialQuery, messages);
+    }
+  }, [messages, user, initialQuery]);
 
   const handleSendFollowUp = (queryText) => {
     if (!queryText.trim()) return;
@@ -101,7 +111,7 @@ export const ChatView = ({ initialQuery }) => {
             );
           }
 
-          /* AI Response: Clean Text Only (No box frame / No Write Code block) */
+          /* AI Response: Clean Text Only */
           return (
             <div 
               key={msg.id}

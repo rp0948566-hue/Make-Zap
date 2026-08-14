@@ -1,6 +1,9 @@
 import React from 'react';
+import { useAuth } from '../AuthContext';
 
 export const NavigationBar = ({ onLoginClick }) => {
+  const { user, signOut } = useAuth();
+
   return (
     <nav 
       style={{
@@ -32,32 +35,56 @@ export const NavigationBar = ({ onLoginClick }) => {
         Mark Zap
       </div>
 
-      {/* Right side Log In button */}
+      {/* Right side Log In / Profile button */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <button 
-          onClick={onLoginClick}
-          style={{
-            fontFamily: "'Schibsted Grotesk', sans-serif",
-            fontWeight: 500,
-            fontSize: '16px',
-            letterSpacing: '-0.2px',
-            color: '#ffffff',
-            backgroundColor: '#000000',
-            border: 'none',
-            width: '101px',
-            height: '42px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
-            transition: 'opacity 0.2s ease, transform 0.1s ease'
-          }}
-          className="btn-login"
-        >
-          Log In
-        </button>
+        {user ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '14px', fontWeight: 600, color: '#000000' }}>
+              {user.user_metadata?.full_name || user.email}
+            </span>
+            <button 
+              onClick={signOut}
+              style={{
+                fontFamily: "'Schibsted Grotesk', sans-serif",
+                fontWeight: 500,
+                fontSize: '14px',
+                color: '#ffffff',
+                backgroundColor: '#1c1c1c',
+                border: 'none',
+                padding: '8px 16px',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
+        ) : (
+          <button 
+            onClick={onLoginClick}
+            style={{
+              fontFamily: "'Schibsted Grotesk', sans-serif",
+              fontWeight: 500,
+              fontSize: '16px',
+              letterSpacing: '-0.2px',
+              color: '#ffffff',
+              backgroundColor: '#000000',
+              border: 'none',
+              width: '101px',
+              height: '42px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',
+              transition: 'opacity 0.2s ease, transform 0.1s ease'
+            }}
+            className="btn-login"
+          >
+            Log In
+          </button>
+        )}
       </div>
     </nav>
   );
