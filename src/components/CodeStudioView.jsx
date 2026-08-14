@@ -11,14 +11,15 @@ export const CodeStudioView = ({ initialQuery }) => {
     { 
       id: 2, 
       sender: 'ai', 
-      text: `Code generation session initialized for "${initialQuery.replace('/code', '').trim() || 'Custom Script'}". Workspace active.` 
+      text: `Code generation & clone session initialized for "${initialQuery.replace('/code', '').trim() || 'Website Clone & Downloader'}". Workspace active.` 
     }
   ]);
-  const [deviceMode, setDeviceMode] = useState('mobile'); // 'mobile' | 'desktop'
-  const [panelTabMode, setPanelTabMode] = useState('code'); // Default to 'code' for /code mode
+  const [deviceMode, setDeviceMode] = useState('desktop'); // 'mobile' | 'desktop'
+  const [panelTabMode, setPanelTabMode] = useState('code'); // Auto-select /code mode
   const [isPaneVisible, setIsPaneVisible] = useState(true);
-  const [selectedFile, setSelectedFile] = useState('SearchInputBox.jsx');
-  const [isFolderOpen, setIsFolderOpen] = useState(true);
+  const [selectedFile, setSelectedFile] = useState('index.html');
+  const [folder1Open, setFolder1Open] = useState(true);
+  const [folder2Open, setFolder2Open] = useState(true);
 
   // Sync session to Supabase
   useEffect(() => {
@@ -33,119 +34,142 @@ export const CodeStudioView = ({ initialQuery }) => {
     const aiMsg = {
       id: Date.now() + 1,
       sender: 'ai',
-      text: `Updated code configuration for "${queryText}". Workspace code updated.`
+      text: `Updated clone configuration for "${queryText}". Workspace files updated.`
     };
     setMessages((prev) => [...prev, userMsg, aiMsg]);
   };
 
   const isMobileMode = deviceMode === 'mobile';
 
-  const designFiles = [
-    { name: 'SearchInputBox.jsx', type: 'jsx' },
-    { name: 'ChatView.jsx', type: 'jsx' },
-    { name: 'CodeStudioView.jsx', type: 'jsx' },
-    { name: 'LeftGlassPanel.jsx', type: 'jsx' },
-    { name: 'LoginModal.jsx', type: 'jsx' },
-    { name: 'NavigationBar.jsx', type: 'jsx' },
-    { name: 'VideoBackground.jsx', type: 'jsx' }
+  const folder1Files = [
+    { name: 'index.html', type: 'html' },
+    { name: 'App.jsx', type: 'jsx' },
+    { name: 'HeroSection.jsx', type: 'jsx' },
+    { name: 'LeadCaptureForm.jsx', type: 'jsx' },
+    { name: 'styles.css', type: 'css' }
+  ];
+
+  const folder2Files = [
+    { name: 'downloader.py', type: 'py' },
+    { name: 'site_cloner.js', type: 'js' },
+    { name: 'asset_extractor.js', type: 'js' },
+    { name: 'README.md', type: 'md' }
   ];
 
   const codeSnippets = {
-    'SearchInputBox.jsx': `import React, { useState, useRef } from 'react';
-import { AISparkleIcon, UpArrowIcon, PaperclipIcon, SearchIcon, CodeIcon } from './Icons';
+    'index.html': `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mark Zap Cloned Site Showcase</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="bg-black text-white font-sans">
+  <div id="root"></div>
+  <script type="module" src="/App.jsx"></script>
+</body>
+</html>`,
+    'App.jsx': `import React from 'react';
+import { HeroSection } from './HeroSection';
+import { LeadCaptureForm } from './LeadCaptureForm';
 
-export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) => {
-  const [text, setText] = useState('');
-  const textareaRef = useRef(null);
+export default function App() {
+  return (
+    <main className="min-h-screen bg-slate-950 text-white flex flex-col items-center">
+      <HeroSection />
+      <LeadCaptureForm />
+    </main>
+  );
+}`,
+    'HeroSection.jsx': `import React from 'react';
 
-  const handleSend = () => {
-    if (!text.trim()) return;
-    if (onSubmit) onSubmit(text);
-    setText('');
+export const HeroSection = () => {
+  return (
+    <section className="py-20 px-8 max-w-5xl mx-auto text-center">
+      <h1 className="text-5xl font-bold tracking-tight text-white mb-6">
+        High-Converting Cloned Website Engine
+      </h1>
+      <p className="text-xl text-slate-300 max-w-2xl mx-auto">
+        Automated website downloader & clone showcase with real-time lead capture integration.
+      </p>
+    </section>
+  );
+};`,
+    'LeadCaptureForm.jsx': `import React, { useState } from 'react';
+
+export const LeadCaptureForm = () => {
+  const [email, setEmail] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    alert('Lead captured successfully!');
   };
 
   return (
-    <div style={{ maxWidth: '728px', width: '100%', borderRadius: '22px' }}>
-      <div style={{ backgroundColor: '#ffffff', borderRadius: '16px', padding: '18px' }}>
-        <textarea
-          ref={textareaRef}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={placeholder}
-        />
-        <button onClick={handleSend}><UpArrowIcon /></button>
-      </div>
-    </div>
+    <form onSubmit={handleSubmit} className="flex gap-3 max-w-md mx-auto">
+      <input 
+        type="email" 
+        placeholder="Enter business email..." 
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        className="px-4 py-3 rounded-lg bg-slate-900 border border-slate-700 text-white flex-1"
+      />
+      <button type="submit" className="px-6 py-3 rounded-lg bg-green-500 text-black font-semibold">
+        Submit Lead
+      </button>
+    </form>
   );
 };`,
-    'ChatView.jsx': `import React, { useState } from 'react';
-import { SearchInputBox } from './SearchInputBox';
+    'styles.css': `/* Website Cloner Custom CSS Rules */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #040605;
+  color: #ffffff;
+  font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
 
-export const ChatView = ({ initialQuery }) => {
-  const [messages, setMessages] = useState([
-    { id: 1, sender: 'user', text: initialQuery }
-  ]);
+.hero-gradient {
+  background: linear-gradient(135deg, rgba(48,209,88,0.15) 0%, rgba(10,132,255,0.15) 100%);
+}`,
+    'downloader.py': `# Complete Website Downloader Engine
+import urllib.request
+import os
 
-  return (
-    <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-      {messages.map((msg) => (
-        <div key={msg.id} style={{ color: '#fff' }}>{msg.text}</div>
-      ))}
-      <SearchInputBox placeholder="Ask follow-up..." />
-    </div>
-  );
-};`,
-    'CodeStudioView.jsx': `import React, { useState } from 'react';
-import { SearchInputBox } from './SearchInputBox';
+def download_site_assets(url, output_dir):
+    print(f"[*] Downloading website structure from {url} to {output_dir}...")
+    os.makedirs(output_dir, exist_ok=True)
+    # Asset extraction & local mirror saving logic
+    print("[✓] Website assets successfully mirrored.")
 
-export const CodeStudioView = ({ initialQuery }) => {
-  const [selectedFile, setSelectedFile] = useState('SearchInputBox.jsx');
+if __name__ == "__main__":
+    download_site_assets("https://example-lead-target.com", "./downloads")`,
+    'site_cloner.js': `// Site Cloner Module — Complete Asset Extractor
+import fs from 'fs';
+import path from 'path';
 
-  return (
-    <div style={{ display: 'flex', width: '100vw', height: '100vh' }}>
-      {/* Split-screen Code Studio & Phone/Desktop Workspace */}
-    </div>
-  );
-};`,
-    'LeftGlassPanel.jsx': `import React from 'react';
-import { PlusIcon, HistoryIcon, DownloadIcon } from './Icons';
+export async function cloneWebsiteStructure(targetUrl) {
+  console.log(\`[Cloner] Processing \${targetUrl}...\`);
+  // Mirror DOM, CSS styles, and asset images
+  return { status: 200, assetsExtracted: 48 };
+}`,
+    'asset_extractor.js': `// Asset Extractor Script
+export function extractImagesAndFonts(htmlString) {
+  const imageRegex = /<img[^>]+src="([^">]+)"/g;
+  const matches = [...htmlString.matchAll(imageRegex)];
+  return matches.map(m => m[1]);
+}`,
+    'README.md': `# Complete Website Downloader & Cloner Workspace
 
-export const LeftGlassPanel = ({ onNewChat }) => {
-  return (
-    <aside style={{ width: '64px', height: '100vh', position: 'fixed' }}>
-      {/* 64px Dark Glass Navigation Rail */}
-    </aside>
-  );
-};`,
-    'LoginModal.jsx': `import React from 'react';
-import { useAuth } from '../AuthContext';
+This workspace contains automated website downloading, asset extraction, and JSX clone rendering modules.
 
-export const LoginModal = ({ onClose }) => {
-  const { signInWithGoogle } = useAuth();
-  return (
-    <div style={{ position: 'fixed', inset: 0 }}>
-      {/* Google OAuth & Email Authentication Modal */}
-    </div>
-  );
-};`,
-    'NavigationBar.jsx': `import React from 'react';
-
-export const NavigationBar = ({ onLoginClick }) => {
-  return (
-    <nav style={{ padding: '16px 120px', width: '100%' }}>
-      <div style={{ fontSize: '34px', fontWeight: 700 }}>Mark Zap</div>
-    </nav>
-  );
-};`,
-    'VideoBackground.jsx': `import React from 'react';
-
-export const VideoBackground = () => {
-  return (
-    <video autoPlay loop muted playsInline style={{ position: 'fixed', inset: 0 }}>
-      <source src="https://d8j0ntlcm91z4.cloudfront.net/..." type="video/mp4" />
-    </video>
-  );
-};`
+## Features Included
+- HTML5 / React JSX Clone Mirror
+- Automated CSS & Media Asset Extractor
+- Deep Python & Node.js Downloader Scripts
+`
   };
 
   return (
@@ -199,10 +223,9 @@ export const VideoBackground = () => {
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <CodeIcon className="w-4 h-4" />
-            <span style={{ fontSize: '15px', fontWeight: 700, color: '#30D158' }}>Code Studio</span>
+            <span style={{ fontSize: '15px', fontWeight: 700, color: '#30D158' }}>Code Studio (/code)</span>
           </div>
 
-          {/* Toggle Pane Button on Left Header if pane is hidden */}
           {!isPaneVisible && (
             <button
               onClick={() => setIsPaneVisible(true)}
@@ -287,12 +310,12 @@ export const VideoBackground = () => {
         <div style={{ width: '100%', maxWidth: isPaneVisible ? (isMobileMode ? '728px' : '100%') : '728px', margin: isPaneVisible ? '0' : '0 auto' }}>
           <SearchInputBox 
             onSubmit={handleSendFollowUp} 
-            placeholder="Write code command..." 
+            placeholder="Write code or clone command..." 
           />
         </div>
       </div>
 
-      {/* Right Column: Code Studio & Phone/Desktop Workspace */}
+      {/* Right Column: Code Studio & Website Cloner Workspace */}
       <div
         style={{
           flex: isPaneVisible ? (panelTabMode === 'code' ? 1 : (isMobileMode ? 'none' : 1)) : 0,
@@ -323,7 +346,7 @@ export const VideoBackground = () => {
             boxSizing: 'border-box'
           }}
         >
-          {/* Main Tab Switchers */}
+          {/* Main Tab Switchers - Auto Select /code Mode */}
           <div style={{ display: 'flex', backgroundColor: 'rgba(255, 255, 255, 0.08)', borderRadius: '8px', padding: '2px', gap: '2px' }}>
             <button
               onClick={() => setPanelTabMode('code')}
@@ -339,7 +362,7 @@ export const VideoBackground = () => {
                 transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
               }}
             >
-              💻 Code Workspace
+              💻 Code Workspace (/code)
             </button>
             <button
               onClick={() => setPanelTabMode('preview')}
@@ -373,8 +396,7 @@ export const VideoBackground = () => {
                     padding: '4px 10px',
                     fontSize: '12px',
                     fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+                    cursor: 'pointer'
                   }}
                 >
                   📱 Phone
@@ -389,8 +411,7 @@ export const VideoBackground = () => {
                     padding: '4px 10px',
                     fontSize: '12px',
                     fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)'
+                    cursor: 'pointer'
                   }}
                 >
                   🖥️ Desktop
@@ -398,7 +419,6 @@ export const VideoBackground = () => {
               </div>
             )}
 
-            {/* Hide Pane Button */}
             <button
               onClick={() => setIsPaneVisible(false)}
               title="Hide Display Pane"
@@ -418,7 +438,7 @@ export const VideoBackground = () => {
           </div>
         </div>
 
-        {/* Panel Main Area: Code View with 📁 Design Folder Tree */}
+        {/* Panel Main Area: Code View with 2 Integrated Folders */}
         {panelTabMode === 'code' ? (
           <div
             style={{
@@ -429,30 +449,31 @@ export const VideoBackground = () => {
               backgroundColor: '#070908'
             }}
           >
-            {/* Explorer Sidebar Tree with 📁 Design Folder */}
+            {/* Explorer Sidebar Tree */}
             <div
               style={{
-                width: '220px',
+                width: '260px',
                 backgroundColor: 'rgba(12, 16, 14, 0.95)',
                 borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-                padding: '16px 12px',
+                padding: '16px 10px',
                 boxSizing: 'border-box',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '12px',
+                gap: '14px',
                 fontFamily: "'SFMono-Regular', Consolas, monospace",
-                fontSize: '12.5px',
-                userSelect: 'none'
+                fontSize: '12px',
+                userSelect: 'none',
+                overflowY: 'auto'
               }}
             >
               <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', letterSpacing: '0.8px' }}>
                 EXPLORER
               </div>
 
-              {/* 📁 Design Folder Item */}
+              {/* FOLDER 1: clone_of_the_website_shown_in_the_image_otmtyq */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div
-                  onClick={() => setIsFolderOpen(!isFolderOpen)}
+                  onClick={() => setFolder1Open(!folder1Open)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -460,19 +481,22 @@ export const VideoBackground = () => {
                     color: '#30D158',
                     fontWeight: 700,
                     cursor: 'pointer',
-                    padding: '4px 6px',
+                    padding: '6px 8px',
                     borderRadius: '6px',
-                    backgroundColor: 'rgba(48, 209, 88, 0.1)'
+                    backgroundColor: 'rgba(48, 209, 88, 0.1)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
                   }}
+                  title="clone_of_the_website_shown_in_the_image_otmtyq"
                 >
-                  <span style={{ fontSize: '11px', transition: 'transform 0.15s ease', transform: isFolderOpen ? 'rotate(90deg)' : 'none' }}>▶</span>
-                  <span>📁 Design</span>
+                  <span style={{ fontSize: '10px', transition: 'transform 0.15s ease', transform: folder1Open ? 'rotate(90deg)' : 'none' }}>▶</span>
+                  <span>📁 website_clone_otmtyq</span>
                 </div>
 
-                {/* Sub-files inside 📁 Design */}
-                {isFolderOpen && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '16px', marginTop: '2px' }}>
-                    {designFiles.map((f, idx) => {
+                {folder1Open && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '14px', marginTop: '2px' }}>
+                    {folder1Files.map((f, idx) => {
                       const isSelected = selectedFile === f.name;
                       return (
                         <div
@@ -482,17 +506,70 @@ export const VideoBackground = () => {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '6px',
-                            padding: '6px 8px',
+                            padding: '5px 8px',
                             borderRadius: '6px',
                             backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
                             color: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
                             cursor: 'pointer',
                             fontWeight: isSelected ? 600 : 400,
-                            fontSize: '12px',
-                            transition: 'all 0.15s ease'
+                            fontSize: '11.5px'
                           }}
                         >
-                          <span style={{ fontSize: '13px', color: '#0A84FF' }}>📄</span>
+                          <span style={{ fontSize: '12px', color: '#0A84FF' }}>📄</span>
+                          <span>{f.name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* FOLDER 2: Complete-Website-Downloader-main */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div
+                  onClick={() => setFolder2Open(!folder2Open)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    color: '#0A84FF',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    padding: '6px 8px',
+                    borderRadius: '6px',
+                    backgroundColor: 'rgba(10, 132, 255, 0.1)',
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                  title="Complete-Website-Downloader-main"
+                >
+                  <span style={{ fontSize: '10px', transition: 'transform 0.15s ease', transform: folder2Open ? 'rotate(90deg)' : 'none' }}>▶</span>
+                  <span>📁 Website-Downloader</span>
+                </div>
+
+                {folder2Open && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', paddingLeft: '14px', marginTop: '2px' }}>
+                    {folder2Files.map((f, idx) => {
+                      const isSelected = selectedFile === f.name;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => setSelectedFile(f.name)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            padding: '5px 8px',
+                            borderRadius: '6px',
+                            backgroundColor: isSelected ? 'rgba(255, 255, 255, 0.14)' : 'transparent',
+                            color: isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.7)',
+                            cursor: 'pointer',
+                            fontWeight: isSelected ? 600 : 400,
+                            fontSize: '11.5px'
+                          }}
+                        >
+                          <span style={{ fontSize: '12px', color: '#FF9F0A' }}>📄</span>
                           <span>{f.name}</span>
                         </div>
                       );
@@ -522,7 +599,7 @@ export const VideoBackground = () => {
                     {selectedFile}
                   </span>
                   <span style={{ fontSize: '10.5px', color: '#30D158', backgroundColor: 'rgba(48, 209, 88, 0.15)', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
-                    JavaScript React
+                    Active Clone Module
                   </span>
                 </div>
 
