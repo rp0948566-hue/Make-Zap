@@ -1,11 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { AISparkleIcon, UpArrowIcon, PaperclipIcon, SearchIcon, CodeIcon } from './Icons';
 
-export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) => {
+export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything or search leads..." }) => {
   const [text, setText] = useState('');
+  const [attachedFile, setAttachedFile] = useState(null);
   const [showCommandsMenu, setShowCommandsMenu] = useState(false);
   const [commandFilter, setCommandFilter] = useState('');
+
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const commandOptions = [
     { cmd: '/code', label: 'Write Code', desc: 'Generate & format production-ready code', icon: <CodeIcon className="w-4 h-4" /> },
@@ -22,7 +25,6 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) =>
     const val = e.target.value.slice(0, 3000);
     setText(val);
 
-    // Detect slash / triggers
     const lastSlashIndex = val.lastIndexOf('/');
     if (lastSlashIndex !== -1 && (lastSlashIndex === 0 || val[lastSlashIndex - 1] === ' ')) {
       const query = val.slice(lastSlashIndex);
@@ -41,12 +43,21 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) =>
     }
   };
 
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAttachedFile(file);
+      setText((prev) => prev ? `${prev} [Attached PDF: ${file.name}]` : `Analyze PDF Document: ${file.name}`);
+    }
+  };
+
   const handleSend = () => {
-    if (!text.trim()) return;
+    if (!text.trim() && !attachedFile) return;
     if (onSubmit) {
       onSubmit(text);
     }
     setText('');
+    setAttachedFile(null);
     setShowCommandsMenu(false);
   };
 
@@ -77,6 +88,15 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) =>
         position: 'relative'
       }}
     >
+      {/* Hidden File Input for PDF Upload */}
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleFileUpload} 
+        accept=".pdf,.doc,.docx,.txt" 
+        style={{ display: 'none' }} 
+      />
+
       {/* Slash Commands Dropdown Menu Popup */}
       {showCommandsMenu && filteredCommands.length > 0 && (
         <div
@@ -100,61 +120,88 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) =>
             fontFamily: "'Schibsted Grotesk', 'Inter', sans-serif"
           }}
         >
-          <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255, 255, 255, 0.45)', textTransform: 'uppercase', padding: '6px 12px 4px 12px', letterSpacing: '0.8px' }}>
-            Commands
-          </div>
-          {filteredCommands.map((c, idx) => (
+          {filteredCommands.map((cmdObj, idx) => (
             <div
               key={idx}
-              onClick={() => handleSelectCommand(c)}
+              onClick={() => handleSelectCommand(cmdObj)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '10px 12px',
+                gap: '12px',
+                padding: '10px 14px',
                 borderRadius: '10px',
-                backgroundColor: 'rgba(255, 255, 255, 0.06)',
-                color: '#ffffff',
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
                 cursor: 'pointer',
                 transition: 'background-color 0.15s ease'
               }}
               className="glass-panel-item"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ color: '#30D158' }}>{c.icon}</span>
-                <span style={{ fontSize: '14.5px', fontWeight: 600 }}>{c.cmd}</span>
-                <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.65)' }}>— {c.label}</span>
+              <div style={{ color: '#30D158' }}>{cmdObj.icon}</div>
+              <div>
+                <div style={{ fontSize: '13.5px', fontWeight: 600, color: '#ffffff' }}>
+                  {cmdObj.cmd} — {cmdObj.label}
+                </div>
+                <div style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.55)', marginTop: '2px' }}>
+                  {cmdObj.desc}
+                </div>
               </div>
-              <span style={{ fontSize: '11.5px', color: 'rgba(255, 255, 255, 0.4)' }}>{c.desc}</span>
             </div>
           ))}
         </div>
       )}
 
-      {/* Main Single White Card Container */}
+      {/* Main Inner White Card */}
       <div 
         style={{
-          backgroundColor: '#ffffff',
+          width: '100%',
+          backgroundColor: 'rgba(255, 255, 255, 0.96)',
           borderRadius: '16px',
-          padding: '18px 18px 14px 18px',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.12)',
+          padding: '18px 20px',
+          boxSizing: 'border-box',
+          boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12)',
           display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-          minHeight: '120px'
+          flexDirection: 'column'
         }}
       >
-        {/* Top portion inside white card: Input + Submit Button */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
-          <textarea 
+        {/* Attached File Pill Badge if PDF selected */}
+        {attachedFile && (
+          <div
+            style={{
+              alignSelf: 'flex-start',
+              backgroundColor: 'rgba(10, 132, 255, 0.15)',
+              border: '1px solid rgba(10, 132, 255, 0.3)',
+              borderRadius: '8px',
+              padding: '4px 10px',
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#0A84FF',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              marginBottom: '10px'
+            }}
+          >
+            <span>📄 {attachedFile.name}</span>
+            <button 
+              onClick={() => setAttachedFile(null)} 
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#0A84FF', fontSize: '11px' }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* Top portion inside white card: Textarea + Submit Arrow */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', gap: '12px' }}>
+          <textarea
             ref={textareaRef}
+            rows={1}
             value={text}
             onChange={handleTextChange}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            rows={2}
             style={{
-              flex: 1,
+              width: '100%',
               border: 'none',
               outline: 'none',
               backgroundColor: 'transparent',
@@ -174,7 +221,7 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) =>
               width: '38px',
               height: '38px',
               borderRadius: '10px',
-              backgroundColor: text.trim() ? '#000000' : 'rgba(0, 0, 0, 0.65)',
+              backgroundColor: text.trim() || attachedFile ? '#000000' : 'rgba(0, 0, 0, 0.65)',
               color: '#ffffff',
               border: 'none',
               display: 'flex',
@@ -200,11 +247,14 @@ export const SearchInputBox = ({ onSubmit, placeholder = "Ask anything..." }) =>
             userSelect: 'none'
           }}
         >
-          {/* Left Action Button */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '22px' }}>
-            <button className="white-card-action">
+            <button 
+              type="button" 
+              onClick={() => fileInputRef.current?.click()} 
+              className="white-card-action"
+            >
               <PaperclipIcon />
-              <span>Attach</span>
+              <span>Attach PDF</span>
             </button>
           </div>
         </div>
