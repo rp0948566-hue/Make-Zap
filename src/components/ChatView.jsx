@@ -188,6 +188,7 @@ export const ChatView = ({ initialQuery }) => {
                       </div>
 
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '13px', color: 'rgba(255, 255, 255, 0.85)', paddingTop: '4px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                        <div><strong>Est. Revenue:</strong> <span style={{ color: '#30D158' }}>{lead.revenueEstimate}</span></div>
                         <div><strong>Phone:</strong> <a href={`tel:${lead.phone}`} style={{ color: '#30D158', textDecoration: 'none' }}>{lead.phone}</a></div>
                         <div><strong>Email:</strong> <a href={`mailto:${lead.email}`} style={{ color: '#0A84FF', textDecoration: 'none' }}>{lead.email}</a></div>
                         <div><strong>Rating:</strong> {lead.rating}</div>
@@ -196,6 +197,23 @@ export const ChatView = ({ initialQuery }) => {
                       <div style={{ fontSize: '12.5px', color: 'rgba(255, 255, 255, 0.65)' }}>
                         <strong>Social Profiles:</strong> {lead.social}
                       </div>
+
+                      {/* Why They Will Build From Us Callout Box */}
+                      {lead.whyBuildFromUs && (
+                        <div
+                          style={{
+                            backgroundColor: 'rgba(48, 209, 88, 0.10)',
+                            border: '1px solid rgba(48, 209, 88, 0.25)',
+                            borderRadius: '10px',
+                            padding: '10px 14px',
+                            fontSize: '12.5px',
+                            color: '#ffffff',
+                            lineHeight: '1.45'
+                          }}
+                        >
+                          <strong style={{ color: '#30D158' }}>💡 Why They Will Build From Us:</strong> {lead.whyBuildFromUs}
+                        </div>
+                      )}
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '4px' }}>
                         <a
@@ -243,7 +261,7 @@ export const ChatView = ({ initialQuery }) => {
       >
         <SearchInputBox 
           onSubmit={handleSendFollowUp} 
-          placeholder="Search businesses without a website in any location..." 
+          placeholder="Search mid-range businesses without a website..." 
         />
       </div>
     </div>

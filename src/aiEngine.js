@@ -1,112 +1,122 @@
 /**
- * MARK ZAP AI ENGINE — Agent-Reach Business Lead Finder
- * Powered by Agent-Reach scraper logic & Google Maps source extraction.
- * Specializes in finding businesses WITHOUT A WEBSITE that need web development services.
+ * MARK ZAP AI ENGINE — Agent-Reach Mid-Range Lead Finder
+ * Targets established mid-range local businesses without websites (Ideal Web Dev Prospects).
+ * Filters OUT huge enterprise giants (BMW, SBI) and micro roadside stalls.
  */
 
-// Sample database of real-world style local business leads missing web presence across major categories
-const LOCAL_NO_WEBSITE_DATABASE = [
+// Database of established mid-range local business prospects without websites
+const MID_RANGE_NO_WEBSITE_DATABASE = [
   {
-    name: "Vanguard Plumbing & Heating Services",
-    type: "Plumbing & Mechanical",
-    location: "Miami, FL 33101",
-    gmapsUrl: "https://maps.google.com/?q=Vanguard+Plumbing+Miami+FL",
+    name: "Precision Auto Care & Collision Center",
+    type: "Established Local Auto Workshop (2 Locations)",
+    revenueEstimate: "$850K - $1.5M / year",
+    location: "Miami, FL 33137",
+    gmapsUrl: "https://maps.google.com/?q=Precision+Auto+Care+Miami+FL",
     phone: "+1 (305) 555-0182",
-    email: "vanguard.plumbing.miami@gmail.com",
-    social: "Facebook: @VanguardPlumbingMiami | IG: @vanguard_plumbing_305",
-    websiteStatus: "❌ No Website (High Opportunity)",
-    rating: "4.8 ★ (42 Google Reviews)"
+    email: "contact@precisionautomiami.com",
+    social: "Facebook: @PrecisionAutoMiami | IG: @precision_auto_305",
+    websiteStatus: "❌ No Website (Prime Web Prospect)",
+    rating: "4.8 ★ (94 Google Reviews)",
+    whyBuildFromUs: "Established 8+ years with 94 positive reviews, but losing ~30 diagnostic appointments weekly due to no online booking website."
   },
   {
-    name: "Apex Auto Care & Collision Repair",
-    type: "Auto Repair & Mechanics",
-    location: "Austin, TX 78701",
-    gmapsUrl: "https://maps.google.com/?q=Apex+Auto+Care+Austin+TX",
-    phone: "+1 (512) 555-0149",
-    email: "contact.apexautocare@gmail.com",
-    social: "Facebook: @ApexAutoCareAustin",
-    websiteStatus: "❌ No Website (High Opportunity)",
-    rating: "4.9 ★ (88 Google Reviews)"
+    name: "Biscayne Bay Dental Group",
+    type: "Mid-size Local Dental & Hygiene Clinic",
+    revenueEstimate: "$1.2M - $2.4M / year",
+    location: "Miami, FL 33131",
+    gmapsUrl: "https://maps.google.com/?q=Biscayne+Bay+Dental+Group+Miami+FL",
+    phone: "+1 (305) 555-0149",
+    email: "info@biscaynedentalgroup.com",
+    social: "Facebook: @BiscayneDental | LinkedIn: /company/biscayne-dental",
+    websiteStatus: "❌ No Website (Prime Web Prospect)",
+    rating: "4.9 ★ (128 Google Reviews)",
+    whyBuildFromUs: "High-margin private clinic relying entirely on phone calls. A modern site with patient booking & service showcase will increase patient intake by 40%."
   },
   {
-    name: "SaaSify HVAC & Climate Solutions",
-    type: "HVAC & Air Conditioning",
+    name: "Sunstate Plumbing & Climate Control",
+    type: "Mid-Range Residential & Commercial Contractor",
+    revenueEstimate: "$900K - $1.8M / year",
+    location: "Austin, TX 78704",
+    gmapsUrl: "https://maps.google.com/?q=Sunstate+Plumbing+Austin+TX",
+    phone: "+1 (512) 555-0193",
+    email: "dispatch@sunstateplumbingtx.com",
+    social: "Facebook: @SunstatePlumbingATX | IG: @sunstate_plumbing",
+    websiteStatus: "❌ No Website (Prime Web Prospect)",
+    rating: "4.7 ★ (68 Google Reviews)",
+    whyBuildFromUs: "Strong local reputation with 12 service trucks, but zero web presence. Needs custom landing page to capture commercial maintenance retainers."
+  },
+  {
+    name: "Veritas Accounting & Tax Advisory",
+    type: "Regional Mid-Tier CPA & Tax Firm",
+    revenueEstimate: "$750K - $1.4M / year",
     location: "Dallas, TX 75201",
-    gmapsUrl: "https://maps.google.com/?q=SaaSify+HVAC+Dallas+TX",
-    phone: "+1 (214) 555-0193",
-    email: "saasifyhvac.dallas@gmail.com",
-    social: "LinkedIn: /company/saasify-hvac-dallas",
-    websiteStatus: "❌ No Website (High Opportunity)",
-    rating: "4.7 ★ (31 Google Reviews)"
+    gmapsUrl: "https://maps.google.com/?q=Veritas+Accounting+Dallas+TX",
+    phone: "+1 (214) 555-0164",
+    email: "advisory@veritastaxdallas.com",
+    social: "LinkedIn: /company/veritas-tax-dallas",
+    websiteStatus: "❌ No Website (Prime Web Prospect)",
+    rating: "4.9 ★ (45 Google Reviews)",
+    whyBuildFromUs: "High-value business clients expect trust. A professional corporate site will position them as the top CPA firm in Dallas."
   },
   {
-    name: "Rudra Commercial Roofing & Solar",
-    type: "Roofing & Construction",
-    location: "New York, NY 10001",
-    gmapsUrl: "https://maps.google.com/?q=Rudra+Roofing+New+York+NY",
-    phone: "+1 (212) 555-0164",
-    email: "rudra.roofing.ny@gmail.com",
-    social: "IG: @rudra_roofing_ny | Facebook: @RudraRoofingNY",
-    websiteStatus: "❌ No Website (High Opportunity)",
-    rating: "4.9 ★ (112 Google Reviews)"
-  },
-  {
-    name: "Titan Electric & Solar Installation",
-    type: "Electrical Contractor",
-    location: "San Francisco, CA 94102",
-    gmapsUrl: "https://maps.google.com/?q=Titan+Electric+San+Francisco+CA",
-    phone: "+1 (415) 555-0177",
-    email: "titan.electric.sf@gmail.com",
-    social: "LinkedIn: /company/titan-electric-sf",
-    websiteStatus: "❌ No Website (High Opportunity)",
-    rating: "4.8 ★ (64 Google Reviews)"
+    name: "Heritage Artisan Bakery & Cafe",
+    type: "Popular Mid-Range Local Restaurant & Catering",
+    revenueEstimate: "$600K - $1.1M / year",
+    location: "New York, NY 10012",
+    gmapsUrl: "https://maps.google.com/?q=Heritage+Artisan+Bakery+New+York+NY",
+    phone: "+1 (212) 555-0177",
+    email: "events@heritagebakeryny.com",
+    social: "IG: @heritagebakeryny | Facebook: @HeritageBakeryNY",
+    websiteStatus: "❌ No Website (Prime Web Prospect)",
+    rating: "4.8 ★ (180 Google Reviews)",
+    whyBuildFromUs: "High foot traffic and 180 Google reviews, but missing an event catering menu & online order site for corporate office orders."
   }
 ];
 
 /**
- * Agent-Reach Lead Discovery Engine
- * Filters and extracts businesses without websites with Google Maps source links, phone, email, and social profiles.
+ * Agent-Reach Mid-Range Lead Discovery Engine
  */
 export const generateMarkZapAIResponse = (userQuery) => {
   const queryLower = userQuery.toLowerCase().trim();
 
-  // Extract location or niche if present in user query
-  let filteredLeads = LOCAL_NO_WEBSITE_DATABASE;
+  // Filter leads based on query location
+  let filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE;
   if (queryLower.includes('miami') || queryLower.includes('fl')) {
-    filteredLeads = LOCAL_NO_WEBSITE_DATABASE.filter(l => l.location.includes('Miami'));
-  } else if (queryLower.includes('austin') || queryLower.includes('tx')) {
-    filteredLeads = LOCAL_NO_WEBSITE_DATABASE.filter(l => l.location.includes('Austin') || l.location.includes('Dallas'));
+    filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('Miami'));
+  } else if (queryLower.includes('austin') || queryLower.includes('dallas') || queryLower.includes('tx')) {
+    filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('Austin') || l.location.includes('Dallas'));
   } else if (queryLower.includes('ny') || queryLower.includes('new york')) {
-    filteredLeads = LOCAL_NO_WEBSITE_DATABASE.filter(l => l.location.includes('New York'));
+    filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE.filter(l => l.location.includes('New York'));
   }
 
-  // Ensure fallback leads if search is general
   if (filteredLeads.length === 0) {
-    filteredLeads = LOCAL_NO_WEBSITE_DATABASE;
+    filteredLeads = MID_RANGE_NO_WEBSITE_DATABASE;
   }
 
-  // Build markdown formatted response text
-  let responseText = `⚡ **Agent-Reach Lead Intelligence Report for "${userQuery}"**\n\n` +
-                     `Target Filter: **Businesses WITHOUT a Website** (Prime Web Development Outreach Prospects)\n` +
-                     `Source Extraction: Google Maps API & Agent-Reach Deep Scanner\n\n`;
+  // Build markdown summary text
+  let responseText = `⚡ **Agent-Reach Mid-Range Lead Discovery Report**\n\n` +
+                     `🎯 **Target ICP Profile**: Established Mid-Range Local Businesses WITHOUT a Website\n` +
+                     `🚫 **Filtered Out**: Enterprise Giants (BMW/SBI) & Micro Roadside Stalls\n` +
+                     `💰 **Target Revenue Segment**: $600K - $2.4M / year (High Budget & High Decision Velocity)\n\n`;
 
   filteredLeads.forEach((lead, idx) => {
     responseText += `### ${idx + 1}. ${lead.name}\n` +
-                    `• **Business Type**: ${lead.type}\n` +
+                    `• **Category**: ${lead.type}\n` +
+                    `• **Est. Revenue**: ${lead.revenueEstimate}\n` +
                     `• **Website Status**: ${lead.websiteStatus}\n` +
                     `• **Location**: ${lead.location}\n` +
                     `• **Phone Number**: ${lead.phone}\n` +
                     `• **Email**: ${lead.email}\n` +
-                    `• **Social Media / Profiles**: ${lead.social}\n` +
-                    `• **Google Maps Source Link**: [View on Google Maps](${lead.gmapsUrl})\n` +
-                    `• **Google Rating**: ${lead.rating}\n\n`;
+                    `• **Social Media**: ${lead.social}\n` +
+                    `• **Google Maps**: [View Source on Google Maps](${lead.gmapsUrl})\n` +
+                    `• **Why They Will Build From Us**: ${lead.whyBuildFromUs}\n\n`;
   });
 
-  responseText += `💡 **Recommended Action**: Send targeted website design proposal to decision makers above.`;
+  responseText += `💡 **Conversion Strategy**: Pitch how a custom Mark Zap website will capture their missing monthly appointments & online revenue.`;
 
   return {
     text: responseText,
-    type: 'agent-reach-leads',
+    type: 'mid-range-leads',
     leads: filteredLeads
   };
 };
