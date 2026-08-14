@@ -11,7 +11,6 @@ export const LeftGlassPanel = ({ onNewChat }) => {
   const [showHistory, setShowHistory] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [activeSettingsTab, setActiveSettingsTab] = useState('general'); // 'general' | 'engine' | 'supabase'
 
   const [historyItems, setHistoryItems] = useState([
     { title: "Lead Generation Strategy Q3", time: "10 mins ago" },
@@ -35,7 +34,7 @@ export const LeftGlassPanel = ({ onNewChat }) => {
     }
   }, [user]);
 
-  // Compute initials or Google User photo from all possible metadata paths
+  // Compute initials or Google User photo
   const userInitial = user?.user_metadata?.full_name 
     ? user.user_metadata.full_name[0].toUpperCase() 
     : (user?.email ? user.email[0].toUpperCase() : 'R');
@@ -198,7 +197,7 @@ export const LeftGlassPanel = ({ onNewChat }) => {
         </div>
       </aside>
 
-      {/* Small Smooth Profile & Settings Popup Menu */}
+      {/* Small Smooth Profile Popup Menu */}
       {showProfileMenu && (
         <div
           className="history-paper-drawer"
@@ -207,9 +206,7 @@ export const LeftGlassPanel = ({ onNewChat }) => {
             bottom: '20px',
             left: '78px',
             width: '210px',
-            backgroundColor: 'rgba(14, 18, 16, 0.96)',
-            backdropFilter: 'blur(36px)',
-            WebkitBackdropFilter: 'blur(36px)',
+            backgroundColor: '#0e1210',
             border: '1px solid rgba(255, 255, 255, 0.16)',
             borderRadius: '16px',
             padding: '8px',
@@ -302,9 +299,7 @@ export const LeftGlassPanel = ({ onNewChat }) => {
             bottom: '24px',
             left: '80px',
             width: '310px',
-            backgroundColor: 'rgba(12, 16, 14, 0.94)',
-            backdropFilter: 'blur(36px)',
-            WebkitBackdropFilter: 'blur(36px)',
+            backgroundColor: '#0c100e',
             border: '1px solid rgba(255, 255, 255, 0.16)',
             borderRadius: '22px',
             padding: '20px',
@@ -382,15 +377,13 @@ export const LeftGlassPanel = ({ onNewChat }) => {
         </div>
       )}
 
-      {/* Center Settings Modal (Covers 65% of screen with soft rounded corners) */}
+      {/* Center Settings Modal (Clean Sharp Solid Dark Glass — NO BLUR) */}
       {showSettingsModal && (
         <div
           style={{
             position: 'fixed',
             inset: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.68)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.82)',
             zIndex: 100,
             display: 'flex',
             alignItems: 'center',
@@ -405,12 +398,10 @@ export const LeftGlassPanel = ({ onNewChat }) => {
               maxWidth: '920px',
               height: '65vh',
               maxHeight: '680px',
-              backgroundColor: 'rgba(14, 18, 16, 0.95)',
-              backdropFilter: 'blur(36px)',
-              WebkitBackdropFilter: 'blur(36px)',
+              backgroundColor: '#0c100e',
               border: '1px solid rgba(255, 255, 255, 0.16)',
               borderRadius: '28px',
-              boxShadow: '0 40px 100px rgba(0, 0, 0, 0.85)',
+              boxShadow: '0 40px 100px rgba(0, 0, 0, 0.95)',
               display: 'flex',
               flexDirection: 'column',
               overflow: 'hidden',
@@ -427,12 +418,12 @@ export const LeftGlassPanel = ({ onNewChat }) => {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                backgroundColor: 'rgba(20, 26, 23, 0.6)'
+                backgroundColor: '#121815'
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '20px' }}>⚙️</span>
-                <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>Workspace & Engine Settings</span>
+                <span style={{ fontSize: '18px', fontWeight: 700, color: '#ffffff' }}>Settings</span>
               </div>
               <button
                 onClick={() => setShowSettingsModal(false)}
@@ -455,124 +446,42 @@ export const LeftGlassPanel = ({ onNewChat }) => {
               </button>
             </div>
 
-            {/* Modal Body: Sidebar Tabs + Content Area */}
-            <div style={{ flex: 1, display: 'flex' }}>
-              {/* Settings Sidebar Tabs */}
-              <div
-                style={{
-                  width: '210px',
-                  backgroundColor: 'rgba(10, 14, 12, 0.8)',
-                  borderRight: '1px solid rgba(255, 255, 255, 0.08)',
-                  padding: '20px 14px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px'
-                }}
-              >
-                <button
-                  onClick={() => setActiveSettingsTab('general')}
-                  style={{
-                    padding: '12px 14px',
-                    borderRadius: '12px',
-                    backgroundColor: activeSettingsTab === 'general' ? '#ffffff' : 'transparent',
-                    color: activeSettingsTab === 'general' ? '#000000' : 'rgba(255, 255, 255, 0.75)',
-                    border: 'none',
-                    textAlign: 'left',
-                    fontSize: '13.5px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  🌐 General
-                </button>
-                <button
-                  onClick={() => setActiveSettingsTab('engine')}
-                  style={{
-                    padding: '12px 14px',
-                    borderRadius: '12px',
-                    backgroundColor: activeSettingsTab === 'engine' ? '#ffffff' : 'transparent',
-                    color: activeSettingsTab === 'engine' ? '#000000' : 'rgba(255, 255, 255, 0.75)',
-                    border: 'none',
-                    textAlign: 'left',
-                    fontSize: '13.5px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  ⚡ Lead Engine
-                </button>
-                <button
-                  onClick={() => setActiveSettingsTab('supabase')}
-                  style={{
-                    padding: '12px 14px',
-                    borderRadius: '12px',
-                    backgroundColor: activeSettingsTab === 'supabase' ? '#ffffff' : 'transparent',
-                    color: activeSettingsTab === 'supabase' ? '#000000' : 'rgba(255, 255, 255, 0.75)',
-                    border: 'none',
-                    textAlign: 'left',
-                    fontSize: '13.5px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  ⚡ Supabase Auth & Cloud
-                </button>
-              </div>
+            {/* Modal Body */}
+            <div style={{ flex: 1, padding: '28px 32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: '14.5px', fontWeight: 600 }}>Cloud Workspace Sync</div>
+                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>Real-time chat persistence & data backup</div>
+                  </div>
+                  <span style={{ fontSize: '12.5px', color: '#30D158', fontWeight: 700, backgroundColor: 'rgba(48,209,88,0.15)', padding: '4px 12px', borderRadius: '8px' }}>
+                    Active
+                  </span>
+                </div>
 
-              {/* Main Content Pane */}
-              <div style={{ flex: 1, padding: '28px 32px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {activeSettingsTab === 'general' && (
-                  <>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>General Workspace Configuration</div>
-                    <div style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <div style={{ fontSize: '14px', fontWeight: 600 }}>App Name</div>
-                          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>Make Zap Lead Finder</div>
-                        </div>
-                        <span style={{ fontSize: '12px', color: '#30D158', fontWeight: 600, backgroundColor: 'rgba(48,209,88,0.15)', padding: '4px 10px', borderRadius: '6px' }}>
-                          v1.0.0 Pro
-                        </span>
-                      </div>
+                <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: '14.5px', fontWeight: 600 }}>Account Status</div>
+                    <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)', marginTop: '2px' }}>
+                      {user ? user.email : 'Not logged in'}
                     </div>
-                  </>
-                )}
-
-                {activeSettingsTab === 'engine' && (
-                  <>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>Lead Engine Preferences</div>
-                    <div style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
-                          <div style={{ fontSize: '14px', fontWeight: 600 }}>Auto Verification Threshold</div>
-                          <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.5)' }}>Filter lead scores above 95/100</div>
-                        </div>
-                        <span style={{ fontSize: '13px', color: '#30D158', fontWeight: 700 }}>95% Active</span>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                {activeSettingsTab === 'supabase' && (
-                  <>
-                    <div style={{ fontSize: '16px', fontWeight: 700, color: '#ffffff' }}>Supabase Cloud Connection</div>
-                    <div style={{ backgroundColor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '18px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
-                      <div>
-                        <div style={{ fontSize: '12px', color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase' }}>SUPABASE PROJECT URL</div>
-                        <div style={{ fontSize: '13.5px', fontFamily: 'monospace', color: '#30D158', marginTop: '4px' }}>
-                          https://laubhpdscqcfvnwdwakh.supabase.co
-                        </div>
-                      </div>
-                      <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>Auth Provider</span>
-                        <span style={{ fontSize: '12px', color: '#ffffff', fontWeight: 600 }}>Google OAuth 2.0</span>
-                      </div>
-                    </div>
-                  </>
-                )}
+                  </div>
+                  <button
+                    onClick={user ? signOut : signInWithGoogle}
+                    style={{
+                      backgroundColor: user ? 'rgba(255,69,58,0.15)' : 'rgba(48,209,88,0.15)',
+                      color: user ? '#ff453a' : '#30D158',
+                      border: 'none',
+                      borderRadius: '8px',
+                      padding: '8px 16px',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      cursor: 'pointer'
+                    }}
+                  >
+                    {user ? 'Sign Out' : 'Sign in with Google'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
