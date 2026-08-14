@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Signal — Log in</title>
+  <script>
+    document.documentElement.classList.add('entry-pending');
+    window.__entryFallback = setTimeout(function() {
+      document.documentElement.classList.remove('entry-pending');
+    }, 3500);
+  </script>
+  <style>
+    :root {
+      --W:1464; --H:949; --photoW:836; --paneW:628; --cardW:613; --cardH:922;
+      --h1-top:65.00px; --h1-fs:42.55px; --h1-ls:-2.553px; --h1-ws:1.300px; --h1-wght:584;
+      --sub-top:120.00px; --sub-fs:20.41px; --sub-ls:-0.245px; --sub-ws:-2.000px; --sub-fw:400; --sub-fwb:700;
+      --fieldpad:19px;
+      --login-fs:16.38px; --login-fw:400; --login-ls:0.200px; --login-gap:10px; --login-padl:-12.00px;
+      --div-top:477px; --or-fs:11.5px; --or-fw:700; --or-ls:0.8px;
+      --or-line-l:205px; --or-line-r:204px;
+      --g-gap:17px;
+      --gt-fs:18.10px; --gt-fw:400; --gt-ls:-0.217px; --gt-ws:-1.000px;
+      --bt-top:611.00px; --bt-fs:16.37px; --bt-fw:400; --bt-ls:-0.196px; --bt-ws:-2.060px; --bt-fwb:700; --bt-uo:3px;
+      --card-shadow:1px 10px 14px rgba(10,14,20,0.14), 0 1px 3px rgba(10,14,20,0.05);
+
+      --ink:#000;          --h1-color:#2c3343;   --sub-grey:#797979;
+      --ph:#606060;         --or:#5a5a5b;
+      --gtext:#232424;     --bottom:#0a0a0a;
+      --btn1:#283139;      --btn2:#293340;
+      --inputFill:#fafafa; --inputBorder:#acacae; --pwFill:#f9f9f9;
+      --gBorder:#c8c8ca;   --divider:#b1b1b2;     --page:#fefefe;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: var(--page); font-family: -apple-system, BlinkMacSystemFont, 'FreeSans', 'Inter', sans-serif; -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; overflow: hidden; }
+
+    .stage { position: fixed; inset: 0; overflow: hidden; }
+    .photo { position: absolute; left: 0; top: 0; height: 100%; width: 57.1038%; overflow: hidden; }
+    .photo-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 100% 50%; display: block; -webkit-user-drag: none; }
+    .photo-img--wide { display: none; }
+    .scrim { display: none; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(7,10,13,.02) 18%, rgba(7,10,13,.12) 48%, rgba(7,10,13,.78) 100%); }
+
+    .pane { position: absolute; left: 57.1038%; right: 0; top: 0; bottom: 0; }
+    .card { position: absolute; left: 1px; top: 14px; width: 613px; height: 922px; border-radius: 26px; overflow: hidden; background: rgba(254,254,254,.90); backdrop-filter: blur(28px) saturate(160%); -webkit-backdrop-filter: blur(28px) saturate(160%); border: 1px solid rgba(0,0,0,.036); box-shadow: var(--card-shadow); }
+    .card-in { position: absolute; width: 613px; height: 922px; transform-origin: left top; }
+    .col { position: absolute; left: 62px; width: 488px; }
+
+    #h1 { top: var(--h1-top); font-family: 'Fustat', 'Eloquia', sans-serif; font-variation-settings: 'wght' var(--h1-wght); font-size: var(--h1-fs); letter-spacing: var(--h1-ls); word-spacing: var(--h1-ws); color: var(--h1-color); line-height: 1; text-align: center; }
+    #sub { top: var(--sub-top); font-size: var(--sub-fs); letter-spacing: var(--sub-ls); word-spacing: var(--sub-ws); font-weight: var(--sub-fw); color: var(--sub-grey); text-align: center; }
+    #sub b { font-weight: var(--sub-fwb); color: var(--ink); }
+
+    .field { position: absolute; left: 62px; width: 489px; display: flex; align-items: center; border-radius: 12px; }
+    .field input { width: 100%; height: 100%; border: none; outline: none; background: transparent; padding: 0 var(--fieldpad); font-size: 16px; color: var(--ink); }
+    #name { top: 170px; height: 52px; background: var(--inputFill); border: 1.5px solid var(--inputBorder); display: none; }
+    #email { top: 203px; height: 61px; background: var(--inputFill); border: 1.5px solid var(--inputBorder); }
+    #pw { top: 273.5px; height: 59px; background: var(--pwFill); border: none; }
+
+    #loginBtn { position: absolute; left: 62px; top: 366px; width: 489px; height: 65.5px; border-radius: 999px; background: linear-gradient(180deg, var(--btn1) 0%, var(--btn2) 100%); color: #fff; display: flex; align-items: center; justify-content: center; gap: var(--login-gap); padding-left: var(--login-padl); padding-right: 4px; box-shadow: 0 8px 20px rgba(18,26,34,.16), 0 2px 5px rgba(18,26,34,.10); border: none; font-size: var(--login-fs); font-weight: var(--login-fw); letter-spacing: var(--login-ls); cursor: pointer; transition: transform .18s cubic-bezier(.2,.7,.3,1), box-shadow .18s ease, filter .18s ease; }
+    #loginBtn:hover { filter: brightness(1.12); }
+    #loginBtn:active { transform: translateY(1px); }
+
+    .divider { position: absolute; left: 63px; top: var(--div-top); width: 487px; display: flex; align-items: center; justify-content: center; }
+    .divider i { height: 1.5px; background: var(--divider); display: block; }
+    .divider i:first-child { flex: 0 0 var(--or-line-l); }
+    .divider i:last-child { flex: 0 0 var(--or-line-r); }
+    .divider b { flex: 1 1 auto; text-align: center; font-size: var(--or-fs); font-weight: var(--or-fw); letter-spacing: var(--or-ls); color: var(--or); }
+
+    #gBtn { position: absolute; left: 62px; top: 535px; width: 489px; height: 59.5px; border: 1.5px solid var(--gBorder); border-radius: 999px; background: rgba(255,255,255,.92); box-shadow: 0 1px 2px rgba(0,0,0,.03); display: flex; align-items: center; justify-content: center; gap: var(--g-gap); font-size: var(--gt-fs); font-weight: var(--gt-fw); letter-spacing: var(--gt-ls); word-spacing: var(--gt-ws); color: var(--gtext); cursor: pointer; transition: background .18s ease, box-shadow .18s ease, transform .18s cubic-bezier(.2,.7,.3,1); }
+    #gBtn:hover { background: #fff; box-shadow: 0 3px 10px rgba(0,0,0,.07); }
+    #gBtn:active { transform: translateY(1px); }
+
+    #bottom { position: absolute; left: 62px; width: 489px; top: var(--bt-top); text-align: center; font-size: var(--bt-fs); font-weight: var(--bt-fw); letter-spacing: var(--bt-ls); word-spacing: var(--bt-ws); color: var(--bottom); }
+    #bottom a { color: #000; font-weight: var(--bt-fwb); text-decoration: underline; text-underline-offset: var(--bt-uo); text-decoration-thickness: 2px; cursor: pointer; }
+
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <section class="photo" id="photoEl">
+      <video class="photo-img photo-img--tall" autoplay muted loop playsinline preload="auto">
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260813_052122_e77a27e6-17f1-4794-889b-3ceaa0e9e8cb.mp4" type="video/mp4">
+      </video>
+      <video class="photo-img photo-img--wide" aria-hidden="true" autoplay muted loop playsinline preload="auto">
+        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260813_052122_e77a27e6-17f1-4794-889b-3ceaa0e9e8cb.mp4" type="video/mp4">
+      </video>
+      <div class="scrim"></div>
+    </section>
+
+    <section class="pane" id="paneEl">
+      <div class="card" id="card">
+        <div class="card-in" id="cardIn">
+          <h1 class="col center" id="h1">Welcome Back!</h1>
+          <p class="col center" id="sub"><b id="subB">Log in</b> <span id="subTxt">to continue monitoring your signals.</span></p>
+
+          <div class="field" id="name">
+            <input type="text" placeholder="Full Name" autocomplete="name" aria-label="Full Name">
+          </div>
+
+          <div class="field" id="email">
+            <input type="email" placeholder="Eg. johndoe@gmail.com" autocomplete="email" aria-label="Email address">
+          </div>
+
+          <div class="field" id="pw">
+            <input type="password" id="pwInput" placeholder="Password" autocomplete="current-password" aria-label="Password">
+          </div>
+
+          <button type="button" id="loginBtn">
+            <span id="btnTxt">Login</span>
+            <svg width="14" height="14" viewBox="0 0 22 22" fill="none">
+              <path d="M3 11h15.4M11 3.3l7.7 7.7-7.7 7.7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="divider" id="dividerEl">
+            <i></i><b>OR</b><i></i>
+          </div>
+
+          <button type="button" id="gBtn">
+            <svg width="19" height="19" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.66 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.28-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.66 48 24 48z"/>
+            </svg>
+            <span>Sign in with Google</span>
+          </button>
+
+          <p id="bottom">
+            <span id="botPrefix">Don&#8217;t have an account?</span> 
+            <a href="#" id="toggleLink">Start Free</a>
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function() {
+      var REF_W = 1464, PANE_W = 628, CARD_W = 613;
+      var CONTENT_H = 697;
+      var PANE_RATIO = PANE_W / REF_W;
+
+      var photoEl = document.getElementById('photoEl');
+      var paneEl = document.getElementById('paneEl');
+      var cardEl = document.getElementById('card');
+      var cardInEl = document.getElementById('cardIn');
+
+      var isReg = false;
+
+      var toggleLink = document.getElementById('toggleLink');
+      toggleLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        isReg = !isReg;
+        
+        document.getElementById('h1').innerText = isReg ? "Create Account" : "Welcome Back!";
+        document.getElementById('subB').innerText = isReg ? "Sign up" : "Log in";
+        document.getElementById('subTxt').innerText = isReg ? "to start monitoring your signals for free." : "to continue monitoring your signals.";
+        document.getElementById('btnTxt').innerText = isReg ? "Start Free" : "Login";
+        document.getElementById('botPrefix').innerHTML = isReg ? "Already have an account?" : "Don&#8217;t have an account?";
+        toggleLink.innerText = isReg ? "Log In" : "Start Free";
+
+        var nameEl = document.getElementById('name');
+        var emailEl = document.getElementById('email');
+        var pwEl = document.getElementById('pw');
+        var pwInput = document.getElementById('pwInput');
+        var btnEl = document.getElementById('loginBtn');
+        var divEl = document.getElementById('dividerEl');
+        var gBtn = document.getElementById('gBtn');
+        var botEl = document.getElementById('bottom');
+
+        if (isReg) {
+          nameEl.style.display = 'flex';
+          emailEl.style.top = '232px'; emailEl.style.height = '52px';
+          pwEl.style.top = '294px'; pwEl.style.height = '52px'; pwEl.style.border = '1.5px solid #acacae';
+          pwInput.placeholder = "Create Password";
+          btnEl.style.top = '364px'; btnEl.style.height = '58px';
+          divEl.style.top = '440px';
+          gBtn.style.top = '490px'; gBtn.style.height = '54px';
+          botEl.style.top = '562px';
+        } else {
+          nameEl.style.display = 'none';
+          emailEl.style.top = '203px'; emailEl.style.height = '61px';
+          pwEl.style.top = '273.5px'; pwEl.style.height = '59px'; pwEl.style.border = 'none';
+          pwInput.placeholder = "Password";
+          btnEl.style.top = '366px'; btnEl.style.height = '65.5px';
+          divEl.style.top = '477px';
+          gBtn.style.top = '535px'; gBtn.style.height = '59.5px';
+          botEl.style.top = '611px';
+        }
+      });
+
+      var mqLandscape = window.matchMedia('(min-width:700px) and (min-aspect-ratio:51/50)');
+
+      function photoRatio(vw) {
+        if (vw >= 1280) return 1 - PANE_RATIO;
+        if (vw >= 1000) return 0.571038 - (1280 - vw) * (0.571038 - 0.42) / 280;
+        if (vw >= 820) return 0.42 - (1000 - vw) * (0.42 - 0.36) / 180;
+        return 0.36;
+      }
+
+      function clearInline() {
+        if (photoEl) photoEl.style.cssText = '';
+        if (paneEl) paneEl.style.cssText = '';
+        if (cardEl) cardEl.style.cssText = '';
+        if (cardInEl) cardInEl.style.cssText = '';
+      }
+
+      function layout() {
+        clearInline();
+        var vw = window.innerWidth;
+        var vh = window.innerHeight;
+
+        if (mqLandscape.matches) {
+          document.body.classList.remove('stacked', 'tabport');
+          document.body.classList.add('land');
+
+          var pr = photoRatio(vw);
+          var paneW = vw * (1 - pr);
+
+          if (photoEl) photoEl.style.width = (pr * 100) + '%';
+          if (paneEl) paneEl.style.left = (pr * 100) + '%';
+
+          var cs = Math.min(paneW / PANE_W, vh / CONTENT_H);
+          var gapL = 1 * cs, mT = 14 * cs, mB = 13 * cs, mR = 14 * cs;
+          var cw = Math.max(CARD_W * cs, paneW - gapL - mR);
+          var ch = vh - mT - mB;
+
+          if (cardEl) {
+            cardEl.style.width = cw + 'px';
+            cardEl.style.height = ch + 'px';
+            cardEl.style.borderRadius = (26 * cs) + 'px';
+            cardEl.style.borderWidth = Math.max(1, cs) + 'px';
+          }
+
+          if (cardInEl) {
+            cardInEl.style.transform = 'translate(' + ((cw - CARD_W * cs) / 2) + 'px,0) scale(' + cs + ')';
+          }
+        } else if (vw >= 700) {
+          document.body.classList.remove('stacked', 'land');
+          document.body.classList.add('tabport');
+        } else {
+          document.body.classList.remove('land', 'tabport');
+          document.body.classList.add('stacked');
+        }
+      }
+
+      layout();
+      window.addEventListener('resize', layout);
+      window.addEventListener('orientationchange', layout);
+    })();
+  </script>
+</body>
+</html>
